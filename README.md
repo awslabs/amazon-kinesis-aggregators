@@ -1,5 +1,11 @@
 # Amazon Kinesis Aggregators
 
+Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
+
+    http://aws.amazon.com/asl/
+
 Amazon Kinesis Aggregators is a Java framework which allows for the simple creation of real time aggregated time series data from data Streamed through Amazon Kinesis. This aggregate dataset can answer questions such as ‘how many times per second has ‘x’ occurred’ or ‘what was the breakdown by hour over the day of the streamed data containing ‘y'. 
 
 Using this framework, you simply describe the format of the data on your stream (CSV, JSON, etc), describe what granularity of times series you require (Seconds, Minute, Hour, etc) and how the data elements which are streamed should be grouped, and the framework handles all the time series calculations and data persistence. You then consume the time series aggregates in your application via Amazon Dynamo DB, interact with the time series using Amazon CloudWatch, or use a a Web Query API to get the required data. You can also analyse the data using Hive on Amazon Elastic MapReduce, or bulk import it to AmazonRedshift. The process runs as a standalone Kinesis Enabled Application, or can be integrated into existing Kinesis applications.
@@ -571,3 +577,9 @@ public interface IMetricsEmitter {
     public void setRegion(Region region);
 }
 ```
+
+Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
+
+    http://aws.amazon.com/asl/
