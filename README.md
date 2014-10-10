@@ -166,7 +166,8 @@ The StreamAggregator class provides several interfaces for querying the underlyi
 #### Querying for a specific aggregate
 
 You would use the following interface to query for a specific label value and time period.
-```public Map<String, AttributeValue> queryValue(String label, Date dateValue, TimeHorizon h)
+```
+public Map<String, AttributeValue> queryValue(String label, Date dateValue, TimeHorizon h)
             throws Exception
 ```
 This method takes the label you are interested in, as well as a Date for the date value. Based on if you have multiple TimeHorizons configured on the Aggregator, it will generate the correct dateValue to query the underlying table with. It is likely that you would use this interface to query across Aggregator data stores looking for related time based values.
@@ -174,11 +175,13 @@ This method takes the label you are interested in, as well as a Date for the dat
 #### Querying for Data by Date
 
 Perhaps more commonly, you will want to query for data by Date range, based upon the date in the Stream. To do this, use method:
-```public List<Map<String, AttributeValue>> queryByDate(Date dateValue, TimeHorizon h,
+```
+public List<Map<String, AttributeValue>> queryByDate(Date dateValue, TimeHorizon h,
             ComparisonOperator comp, int threads) throws Exception
 ```
 This method queries on the basis of the Date Value supplied, for the TimeHorizon you are interested in, and with the ComparisonOperator you select. For instance, to find all Hourly Aggregates from 3pm forward, you'd use:
-```dateValue=Date('2014-01-01 15:00:00'), TimeHorizon.HOUR, ComparisonOperator.GT
+```
+dateValue=Date('2014-01-01 15:00:00'), TimeHorizon.HOUR, ComparisonOperator.GT
 ```
 The Threads parameter is the number of Threads used to do the query. This is due to the index being organised on Hash/Range of scatterPrefix/DateValue.
 
