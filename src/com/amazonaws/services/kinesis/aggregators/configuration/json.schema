@@ -1,0 +1,79 @@
+{
+    "title": "Amazon Kinesis Aggregators Configuration Schema",
+    "type": "object",
+    "properties": {
+        "namespace": {
+            "type": "string",
+            "description": "The namespace for data stored by the Aggregator"
+        },
+        "timeHorizons":  {
+            "type": "array",
+            "description": "The list of all time horizons to be used as the granularity of the Aggregators",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "type": {
+            "description": "The Type of the Aggregator (COUNT or SUM)",
+            "type": "integer"
+        },
+        "dataExtractor": {
+            "description": "Mechanism for extracting data in form for aggregation from the Kinesis Stream. Must be one of CSV, JSON or OBJECT",
+            "type": "string"
+        },
+        "delimiter": {
+            "description": "Delimiter to be used in CSV Data Extractors",
+            "type": "string"
+        },
+        "labelItem": {
+            "description": "Index, Attribute or Method for the value in the stream which should be used as the top level aggregate",
+            "type": "integer",
+            "minValue" : 0
+        },
+        "dateItem": {
+            "description": "Index, Attribute or Method for the value in the stream which should be used as the event date",
+            "type": "integer",
+            "minValue" : 0
+        },
+        "dateFormat": {
+            "description": "(Optional) If the event date is stored on the stream as a String, then supply the date format which can be used to convert it into a date",
+            "type": "string"
+        },
+        "summaryItems":  {
+            "type": "array",
+            "description": "(Optional) The list of expressions of indicies, attributes or methods to be used as aggregated values in addition to event count",
+            "items": {
+                "type": "string"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "filterRegex": {
+            "description": "(Optional) Regular Expression used to filter String type stream data prior to data extraction",
+            "type": "string"
+        },
+        "tableName": {
+            "description": "(Optional) The name of the table to be used for storing Aggregated data in Dynamo DB",
+            "type": "string"
+        },
+        "readIOPS": {
+            "description": "(Optional) The number of provisioned Read IOPS for the Dynamo DB Table",
+            "type": "long"
+        },
+        "writeIOPS": {
+            "description": "(Optional) The number of provisioned Write IOPS for the Dynamo DB Table",
+            "type": "long"
+        },
+        "class": {
+            "description": "(Optional) For Object based Data Extractors, the class to use for serialising data to and from the Kinesis Stream. This may also be an Annotated Class, which will be used over all other configuration",
+            "type": "string"
+        },
+        "failOnDataExtraction": {
+            "description": "(Optional) Controls whether the Aggregator process should stop when data extraction from the stream fails. The default is 'true', but setting this value to 'false' will ensure that an Aggregator continues to process data from a Shard even if it contains bad data",
+            "type": "boolean"
+        }
+    },
+    "required": ["namespace", "timeHorizons", "type", "dataExtractor"]
+}

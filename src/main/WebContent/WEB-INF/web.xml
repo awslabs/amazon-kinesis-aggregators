@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0">
+	<display-name>KinesisAggregatorsBeanstalkApplication</display-name>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+	<listener>
+		<listener-class>com.amazonaws.services.kinesis.aggregators.app.AggregatorsBeanstalkApp</listener-class>
+	</listener>
+	<servlet>
+		<servlet-name>DateQuery</servlet-name>
+		<servlet-class>com.amazonaws.services.kinesis.aggregators.app.DateQueryServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DateQuery</servlet-name>
+		<url-pattern>/dateQuery</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>KeyQuery</servlet-name>
+		<servlet-class>com.amazonaws.services.kinesis.aggregators.app.ListAggregateKeysServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>KeyQuery</servlet-name>
+		<url-pattern>/keyQuery</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet>
+		<servlet-name>LabelQuery</servlet-name>
+		<servlet-class>com.amazonaws.services.kinesis.aggregators.app.QueryByLabelServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>LabelQuery</servlet-name>
+		<url-pattern>/labelQuery</url-pattern>
+	</servlet-mapping>
+</web-app>
