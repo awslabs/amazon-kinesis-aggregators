@@ -1,6 +1,8 @@
 # Amazon Kinesis Aggregators
 
-Amazon Kinesis Aggregators is a Java framework which allows the automatic creation of real time aggregated time series data from Streams on Amazon Kinesis. This dataset can answer questions such as ‘how many times per second has ‘x’ occurred’ or ‘what was the breakdown by hour over the day of the streamed data containing ‘y'. Using this framework, you simply describe the format of the data on your stream (CSV, JSON, etc), describe what granularity of times series you require (Seconds, Minute, Hour, etc) and how the data elements which are streamed should be grouped, and the framework handles all the time series calculations and data persistence. You then simply consume the time series aggregates in your application via Amazon Dynamo DB, or interact with the time series using Amazon CloudWatch, or through a Web Query API. You can also analyse the data using Hive on Amazon Elastic MapReduce, or bulk import it to AmazonRedshift. The process runs as a standalone Kinesis Enabled Application, or can be integrated into existing Kinesis applications.
+Amazon Kinesis Aggregators is a Java framework which allows for the simple creation of real time aggregated time series data from data Streamed through Amazon Kinesis. This aggregate dataset can answer questions such as ‘how many times per second has ‘x’ occurred’ or ‘what was the breakdown by hour over the day of the streamed data containing ‘y'. 
+
+Using this framework, you simply describe the format of the data on your stream (CSV, JSON, etc), describe what granularity of times series you require (Seconds, Minute, Hour, etc) and how the data elements which are streamed should be grouped, and the framework handles all the time series calculations and data persistence. You then consume the time series aggregates in your application via Amazon Dynamo DB, interact with the time series using Amazon CloudWatch, or use a a Web Query API to get the required data. You can also analyse the data using Hive on Amazon Elastic MapReduce, or bulk import it to AmazonRedshift. The process runs as a standalone Kinesis Enabled Application, or can be integrated into existing Kinesis applications.
 
 The data is stored in a time series on the basis of how you aggregate it. An example of a dataset aggregating Telecoms Call Data Records in Amazon Dynamo DB might look like:
 
@@ -20,17 +22,17 @@ Amazon Kinesis Aggregators is built with Apache Maven. To build, simply run Mave
 
 ## Running Aggregators
 
-Amazon Kinesis Aggregators ships with several deployment options which should enable you run with a minimum of operational overhead, while also accommodating advanced deployment use cases. You can run Kinesis Aggregators as:
+Amazon Kinesis Aggregators ships with several deployment options which should enable you run with minimal operational overhead, while also accommodating advanced deployment use cases. You can run Kinesis Aggregators as:
 
-* A fully managed Elastic Beanstalk Application. All you must do is deploy the KinesisAggregators.war Web Archive, and provide a configuration file that is accessible via HTTP.
-* A managed Java client, running through host orchestration your choosing. For example, you might deploy this managed Java client as part of an EC2 Fleet that uses Autoscaling.
-* As part of an existing Kinesis Enabled Application. This allows an existing KCL to 'sideload' Aggregator processing, as an augmentation to an already established Kinesis application.
+* A fully managed Elastic Beanstalk Application (http://aws.amazon.com/elasticbeanstalk). All you must do is deploy the KinesisAggregators.war Web Archive, and provide a configuration file that is accessible via HTTP or on Amazon S3
+* A standalone Java client, running on the EC2 Instance of your choosing. For example, you might deploy this as part of an EC2 Fleet that uses Autoscaling, or through an Amazon OpsWorks Layer (http://aws.amazon.com/opsworks)
+* As part of an existing Kinesis Enabled Application. This allows an existing KCL to 'sideload' Aggregator processing, as an enhancement to an already established Kinesis application.
 
 ### Running Aggregators with Elastic Beanstalk
 
 Amazon Kinesis Aggregators compiles a Web Application Archive (WAR) which allows for easy deployment on Java Application Servers such as Apache Tomcat on Amazon Elastic Beanstalk (http://aws.amazon.com/elasticbeanstalk). Kinesis Aggregators also includes configuration options which inform Elastic Beanstalk to scale the Application on CPU load, which is typically the bottleneck for Kinesis Applications as they scale up. This is the recommended deployment method for Kinesis Aggregators.
 
-To deploy Kinesis Aggregators as an Elastic Beanstalk Application, Create a new Elastic Beanstalk Application, and when prompted by the AWS Console, upload the KinesisAggregators.war file from your local build. Select an instance type that will be suitable for the type of Aggregation you are running (specifically, the higher the granularity of label items, and the more fine grained the TimeHorizon, the larger of an instance you will require). Once deployed, click the URL for the Application Environment, and you will see message:
+To deploy Kinesis Aggregators as an Elastic Beanstalk Application, Create a new Elastic Beanstalk Application using the AWS Console or CLI, and when prompted by the AWS Console, upload the AmazonKinesisAggregators.war file from your local build. Select an instance type that will be suitable for the type of Aggregation you are running (specifically, the higher the granularity of label items, and the more fine grained the TimeHorizon, the more network bandwidth on the instance you will require). Once deployed, click the URL for the Application Environment, and you will see message:
 
 ```OK - Kinesis Aggregators Managed Application hosted in Elastic Beanstalk Online ```
 
@@ -51,7 +53,7 @@ This indicates that the application is deployed, but not configured. To configur
 
 Once added, click 'Save' and Elastic Beanstalk will apply the changes to the environment. Once done, wait a minute or so, and then Snapshot Logs to confirm that the Aggregators configured are running.
 
-### Running the managed Java client application
+### Running the standalone Java client application
 
 This is a great option if you have data on Amazon Kinesis, but have an existing way you want to run the Java client other than Elastic Beanstalk. You can start the application from a server using:
 ```java -cp AmazonKinesisAggregators.jar-complete.jar -Dconfig-file-path=<configuration> -Dstream-name=<stream name> -Dapplication-name=<application name> -Dregion=<region name - us-east-1, eu-west-1, etc> com.amazonaws.services.kinesis.aggregators.consumer.AggregatorConsumer```. In addition to the configuration items as outlined in the Elastic Beanstalk section, you use configuration item:
@@ -62,10 +64,12 @@ to configure the config file. It is recommended that you run your servers with a
 
 ### Configuration
 
-The configuration file is able to create one or more aggregations against the same stream. It is a json file which creates a set of aggregator objects, all of which will be managed by the Framework. You would create one aggregator for each distinct Label that you want to aggregate on. Each Aggregator can then have it's own properties of Time granularity, Aggregator Type, and so on.
+The Aggregators configuration file is able to create one or more aggregations for the same Stream. It is a json file which creates a set of aggregator instances, all of which will be managed by the Framework. You would create one aggregator for each distinct Label that you want to aggregate on. Each Aggregator can then have it's own properties of Time granularity, Aggregator Type, and so on.
 
 The core structure of the config file is an array of Aggregator objects. For example, a configuration which created two aggregators would contain:
+
 ```[{aggregatorDef1}, {aggregatorDef2}]```
+
 where aggregatorDefN is an Aggregator configuration. An Aggregator configuration must include the following attributes:
 
 * **namespace** (String) - The namespace allows you to create separate time series data stores from each other. This namespace will be used with the application name and environment to create the underlying data tables for the time series, as well as the namespace for custom CloudWatch metrics. Use something that's meaningful based upon the Label and time granularity
@@ -110,12 +114,13 @@ Summary items can be configured using a miniature specification language to chan
 * **MIN** - this summary will calculate the minimum value observed for the time period and label values
 * **MAX** - this summary will calculate the maximum value observed for the time period and label values
 * **FIRST** - this summary will only store the first observed value for the time period and label values
-* **MAX** - this summary will always be equal to the latest value for the time period and label values
+* **LAST** - this summary will always be equal to the latest value for the time period and label values
 
 Summary items can have aliases applied like in SQL to control the name of the generated attribute in the data store you write to. You simply add the name of the item you require to the definition of the summary item including functions.
 
 You can also navigate an entity structure in JSON formatted stream data using dot notation. For example, given object:
-```{"name":"Object To Be Aggregated",
+```
+{"name":"Object To Be Aggregated",
  "timeValues": {
    "startTime":"01/01/1970 00:00:00",
    "endTime":"01/01/1970 01:00:00",
@@ -124,7 +129,8 @@ You can also navigate an entity structure in JSON formatted stream data using do
      "calculated":60
    }
   }
-}```
+}
+```
 
 We can access the calculated duration in the above example using a summaryItem of 'timeValues.durations.calculated'. These concepts can be combined into a mini specification:
 
@@ -157,7 +163,7 @@ Of course the table will also include any summary values that were added to the 
 
 #### Indexes
 
-All Aggregator data stores have global secondary indexes (logically) on the date value and on lastWriteSeq. To ensure adequate write performance, these indexes are structured as Hash/Range on the scatterPrefix (a random number between 0 and 99) and the value indexed.
+All Aggregator data stores have global secondary indexes (logically) on the date value. To ensure adequate write performance, these indexes are structured as Hash/Range on the scatterPrefix (a random number between 0 and 99) and the value indexed.
 
 ### Querying the Data
 
@@ -186,6 +192,7 @@ dateValue=Date('2014-01-01 15:00:00'), TimeHorizon.HOUR, ComparisonOperator.GT
 The Threads parameter is the number of Threads used to do the query. This is due to the index being organised on Hash/Range of scatterPrefix/DateValue.
 
 ##### Web Based Query API
+
 The Aggregators Web Application also provides several query API's which return data in JSON format. When deployed, you can make an HTTP request to a variety of endpoint to retrieve different types of data.
 
 ###### Date Based Queries
@@ -205,7 +212,7 @@ Parameters:
 
 This returns all data from the aggregated table for the date period specified
 
-###### Query for Label/Date Values
+###### Query for Distinct Label/Date Values
 
 You may also want to query the Application just to find the unique set of Labels and Date Values that have been aggregated. To do this, use URL:
 
@@ -220,17 +227,19 @@ Parameters:
 
 This returns a unique list of all keys from the aggregated table.
 
+###### Web API Security
+
 Currently there is no security offered for the Web API's, so you must ensure they are only accessible from within your VPC via security group grants or similar. Do NOT make these endpoints publicly accessible.
 
 ## Integrating Aggregators Into Existing Applications
 
 In addition to running Aggregators as a standalone managed KCL application, you can integrate them into an existing KCL application. You can:
 
-* Run the managed consumer from an existing control environment
+* Run the consumer from an existing environment
 * Inject a set of Aggregators into a managed IRecordProcessorFactory
 * Use an existing IRecordProcessor and explicitly send data to one or more Aggregators
 
-### Managed IRecordProcessorFactory
+### Aggregators IRecordProcessorFactory
 
 If you want to build your Kinesis Application Worker and configure it explicitly, you can still use Aggregators to create the IRecordProcessorFactory. In this case simply create a new instance of the com.amazonaws.services.kinesis.aggregators.processor.AggregatorProcessorFactory with the configured Aggregators that should be run.
 
@@ -411,7 +420,7 @@ public interface IKinesisSerialiser<T, U> {
 ```
 #### IDataExtractor
 
-IDataExtractors are responsible for taking the deserialised data, and extracting the relevant Label, Date and Summary items out of the raw dataset. They also typically do any Filtering that is exposed by the IDataExtractor. You would build a new IDataExtractor if the type of data returned by a custom IKinesisSerialiser implementation was not compatible with the existing IDataExtractors in the io package. This new IDataExtractor would conform to:
+IDataExtractors are responsible for reading the deserialised data, and extracting the relevant Label, Date and Summary items. They also typically do any Filtering that is configured on the IDataExtractor. You would build a new IDataExtractor if the type of data returned by a custom IKinesisSerialiser implementation was not compatible with the existing IDataExtractors in the io package. This new IDataExtractor would conform to Interface:
 
 ```
 /**
@@ -474,22 +483,22 @@ public interface IDataExtractor {
 }
 ```
 
-Also note that an IDataExtractor returns multiple Aggregatable objects from the Stream. If you had a requirement to support M:N Kinesis Events to Aggregatable Events, an IDataExtractor could do the job with local state.
+Also note that an IDataExtractor returns multiple Aggregatable objects from the Stream. If you had a requirement to support M:N Kinesis Events to Aggregatable Events, an IDataExtractor could do the job by caching events in local state. However, take care with checkpointing if this model is used.
 
-Finally, please note that the IDataExtractor is STATEFUL for the life of an Aggregator running on a Shard, and contains the configuration of what data is to be extracted. Because a new IDataExtractor will be generated when a new Aggregator is initialised on a shard, you must ensure that it is Thread safe and implement the copy() interface correctly to ensure that multiple instances can operate within a single JVM.
+Finally, please note that the IDataExtractor is STATEFUL for the life of an Aggregator's assignment to a Shard, and contains the configuration of what data is to be extracted. Because a new IDataExtractor will be generated when a new Aggregator is initialised on a shard, you must ensure that it is Thread safe and implement the copy() interface correctly to ensure that multiple instances can operate within a single JVM.
 
 ### Data Store
 
 The Aggregators framework backs its data onto Dynamo DB, and takes advantage of powerful Dynamo DB features such as Hash/Range keys, atomic increment and conditional updates. It also implements a defensive flush mechanism which means that at any provisioned IO Rate, the Aggregator will be able to flush its state to Dynamo DB without timing out.
 
-If you would like to extend Aggregators with support for an alternate backing store, such as a relational database or Redis, you would supply an implementation of com.amazonaws.services.kinesis.aggregators.datastore.IDataStore. This implementation would have to ensure that it could meet the following service levels:
+If you would like to extend Aggregators with support for an alternate backing store, such as a relational database or Redis, you would supply an implementation of com.amazonaws.services.kinesis.aggregators.datastore.IDataStore. This implementation would have to ensure that it could meet the following requirements:
 
 * Ability to flush all internal state to the datastore in 5 minutes or less (this is due to the Kinesis Worker Timeout)
 * Ability to support a composite primary key for all label values and date value
 * Ability to do an atomic, transactional increment operation
 * Ability to conditionally update a discrete value in the table
 
-The implementation of a new IDataStore would conform to:
+The implementation of a new IDataStore would conform to Interface:
 
 ```
 /**
@@ -536,7 +545,7 @@ public interface IDataStore {
 
 ### Metrics Service
 
-By default Aggregators only has the ability to integrate with CloudWatch for the purposes of Metrics dashboarding and alerting. However, it is reasonable to consider wanting to push metrics to platforms such as Ganglia or New Relic. In these cases, you would provide an implementation of the com.amazonaws.services.kinesis.aggregators.metrics.IMetricsEmitter. This implementation would conform to:
+Aggregators provides the ability to push the aggregated data to a metrics service. The built in metrics service is Amazon CloudWatch (http://aws.amazon.com/cloudwatch), which is ideal for dashboarding and alerting. However, you might want to push metrics to platforms such as Ganglia or New Relic. In these cases, you would provide an implementation of com.amazonaws.services.kinesis.aggregators.metrics.IMetricsEmitter:
 
 ```
 /**
