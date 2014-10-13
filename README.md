@@ -1,4 +1,4 @@
-# Amazon Kinesis Aggregators
+Amazon Kinesis Aggregators
 
 Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -6,7 +6,7 @@ Licensed under the Amazon Software License (the "License"). You may not use this
 
     http://aws.amazon.com/asl/
 
-Amazon Kinesis Aggregators is a Java framework which allows for the simple creation of real time aggregated time series data from data Streamed through Amazon Kinesis. This aggregate dataset can answer questions such as ‘how many times per second has ‘x’ occurred’ or ‘what was the breakdown by hour over the day of the streamed data containing ‘y'. 
+Amazon Kinesis Aggregators is a Java framework that enables the automatic creation of real-time aggregated time series data from Amazon Kinesis streams. You can use this data to answer questions such as ‘how many times per second has ‘x’ occurred’ or ‘what was the breakdown by hour over the day of the streamed data containing ‘y'. Using this framework, you simply describe the format of the data on your stream (CSV, JSON, and so on), the granularity of times series that you require (seconds, minutes, hours, and so on), and how the data elements that are streamed should be grouped; the framework handles all the time series calculations and data persistence. You then simply consume the time series aggregates in your application using Amazon DynamoDB, or interact with the time series using Amazon CloudWatch or a Web Query API. You can also analyze the data using Hive on Amazon Elastic MapReduce, or bulk import it to Amazon Redshift. The process runs as a standalone Kinesis Enabled Application which only requires configuration, or can be integrated into existing Amazon Kinesis applications.
 
 The data is stored in a time series based on how you aggregate it. A dataset aggregating Telecoms Call Data Records in DynamoDB might look like this:
 
@@ -179,7 +179,8 @@ The StreamAggregator class provides interfaces for querying the underlying data.
 
 Use the following interface to query for a specific label value and time period.
 
-```public Map<String, AttributeValue> queryValue(String label, Date dateValue, TimeHorizon h)
+```
+public Map<String, AttributeValue> queryValue(String label, Date dateValue, TimeHorizon h)
             throws Exception
 ```
 
@@ -189,13 +190,15 @@ This method takes the label you are interested in, as well as a Date for the dat
 
 Perhaps most commonly, you will query for data by Date range, based upon the date in the stream. To do this, use the following method:
 
-```public List<Map<String, AttributeValue>> queryByDate(Date dateValue, TimeHorizon h,
+```
+public List<Map<String, AttributeValue>> queryByDate(Date dateValue, TimeHorizon h,
             ComparisonOperator comp, int threads) throws Exception
 ```
 
 This method queries by the Date, TimeHorizon, and ComparisonOperator you select. For example, to find all hourly aggregates after 3pm, use:
 
-```dateValue=Date('2014-01-01 15:00:00'), TimeHorizon.HOUR, ComparisonOperator.GT
+```
+dateValue=Date('2014-01-01 15:00:00'), TimeHorizon.HOUR, ComparisonOperator.GT
 ```
 
 The Threads parameter is the number of threads used to do the query. This is due to the index being organized on Hash/Range of scatterPrefix/DateValue.
@@ -224,9 +227,7 @@ This returns all data from the aggregated table for the date period specified.
 
 To query the application to find the unique set of labels and Date values that have been aggregated, use this URL:
 
-```
-<web application>/keyQuery?params
-```
+```<web application>/keyQuery?params```
 
 Parameters:
 
