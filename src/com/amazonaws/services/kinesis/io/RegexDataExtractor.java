@@ -2,8 +2,8 @@ package com.amazonaws.services.kinesis.io;
 
 import java.util.List;
 
-import com.amazonaws.services.kinesis.io.serialiser.CsvSerialiser;
-import com.amazonaws.services.kinesis.io.serialiser.RegexSerialiser;
+import com.amazonaws.services.kinesis.io.serializer.CsvSerializer;
+import com.amazonaws.services.kinesis.io.serializer.RegexSerializer;
 
 /**
  * IDataExtractor implementation which allows for extraction of data from
@@ -14,7 +14,7 @@ public class RegexDataExtractor extends StringDataExtractor<RegexDataExtractor> 
         IDataExtractor {
     private String regex;
 
-    private RegexSerialiser serialiser;
+    private RegexSerializer serialiser;
 
     /**
      * Create a new data extractor using the indicated index for the label value
@@ -35,7 +35,7 @@ public class RegexDataExtractor extends StringDataExtractor<RegexDataExtractor> 
 
     public RegexDataExtractor(String regex, List<Integer> labelIndicies,
             String labelAttributeAlias, int dateValueIndex, String dateAttributeAlias,
-            RegexSerialiser serialiser) {
+            RegexSerializer serialiser) {
         this.regex = regex;
         super.labelIndicies = labelIndicies;
         super.labelAttributeAlias = labelAttributeAlias;
@@ -46,7 +46,7 @@ public class RegexDataExtractor extends StringDataExtractor<RegexDataExtractor> 
         if (serialiser != null) {
             super.serialiser = serialiser;
         } else {
-            super.serialiser = new RegexSerialiser(regex);
+            super.serialiser = new RegexSerializer(regex);
         }
     }
 
@@ -70,7 +70,7 @@ public class RegexDataExtractor extends StringDataExtractor<RegexDataExtractor> 
      * @param serialiser
      * @return
      */
-    public RegexDataExtractor withSerialiser(CsvSerialiser serialiser) {
+    public RegexDataExtractor withSerialiser(CsvSerializer serialiser) {
         super.serialiser = serialiser;
         return this;
     }

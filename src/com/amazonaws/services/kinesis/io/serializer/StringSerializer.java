@@ -1,10 +1,10 @@
-package com.amazonaws.services.kinesis.io.serialiser;
+package com.amazonaws.services.kinesis.io.serializer;
 
 import java.nio.charset.Charset;
 
 import com.amazonaws.services.kinesis.aggregators.InputEvent;
 
-public abstract class StringSerialiser<T extends StringSerialiser<T>> {
+public abstract class StringSerializer<T extends StringSerializer<T>> {
     protected String charset = "UTF-8";
 
     protected String itemTerminator = "\n";

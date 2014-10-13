@@ -1,18 +1,18 @@
 package com.amazonaws.services.kinesis.aggregators.exception;
 
 @SuppressWarnings("serial")
-public class SerialisationException extends Exception {
+public class SerializationException extends Exception {
     private String message;
 
-    public SerialisationException(String message) {
+    public SerializationException(String message) {
         super(message);
     }
 
-    public SerialisationException(Exception e) {
+    public SerializationException(Exception e) {
         super(e);
     }
 
-    public SerialisationException(String message, Exception e) {
+    public SerializationException(String message, Exception e) {
         super(message, e);
     }
 

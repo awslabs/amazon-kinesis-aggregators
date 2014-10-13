@@ -116,7 +116,7 @@ public class QueryByLabelServlet extends AbstractQueryServlet {
             // operation
             // - it may already be initialised
             try {
-                aggGroup.initialise("none");
+                aggGroup.initialize("none");
             } catch (Exception e) {
                 throw new ServletException(e);
             }

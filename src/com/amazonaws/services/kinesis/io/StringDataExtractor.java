@@ -17,10 +17,10 @@ import com.amazonaws.services.kinesis.aggregators.LabelSet;
 import com.amazonaws.services.kinesis.aggregators.StreamAggregator;
 import com.amazonaws.services.kinesis.aggregators.StreamAggregatorUtils;
 import com.amazonaws.services.kinesis.aggregators.exception.InvalidConfigurationException;
-import com.amazonaws.services.kinesis.aggregators.exception.SerialisationException;
+import com.amazonaws.services.kinesis.aggregators.exception.SerializationException;
 import com.amazonaws.services.kinesis.aggregators.exception.UnsupportedCalculationException;
 import com.amazonaws.services.kinesis.aggregators.summary.SummaryElement;
-import com.amazonaws.services.kinesis.io.serialiser.IKinesisSerialiser;
+import com.amazonaws.services.kinesis.io.serializer.IKinesisSerializer;
 
 /**
  * IDataExtractor implementation which allows for extraction of data from
@@ -53,7 +53,7 @@ public class StringDataExtractor<T extends StringDataExtractor<T>> extends Abstr
 
     protected Map<String, Double> sumUpdates;
 
-    protected IKinesisSerialiser<List<List<String>>, byte[]> serialiser;
+    protected IKinesisSerializer<List<List<String>>, byte[]> serialiser;
 
     private final Log LOG = LogFactory.getLog(StringDataExtractor.class);
 
@@ -87,7 +87,7 @@ public class StringDataExtractor<T extends StringDataExtractor<T>> extends Abstr
      * {@inheritDoc}
      */
     @Override
-    public List<AggregateData> getData(InputEvent event) throws SerialisationException {
+    public List<AggregateData> getData(InputEvent event) throws SerializationException {
         try {
             int summaryIndex = -1;
             String dateString;
@@ -129,7 +129,7 @@ public class StringDataExtractor<T extends StringDataExtractor<T>> extends Abstr
                                 LOG.error(String.format(
                                         "Unable to create Date Value element from item '%s' due to invalid format as Epoch Seconds",
                                         dateValueIndex));
-                                throw new SerialisationException(e);
+                                throw new SerializationException(e);
                             }
                         }
                     } else {
@@ -150,7 +150,7 @@ public class StringDataExtractor<T extends StringDataExtractor<T>> extends Abstr
                                 LOG.error(String.format(
                                         "Unable to deserialise Summary '%s' due to NumberFormatException",
                                         i));
-                                throw new SerialisationException(nfe);
+                                throw new SerializationException(nfe);
                             }
                         }
                     }
@@ -161,7 +161,7 @@ public class StringDataExtractor<T extends StringDataExtractor<T>> extends Abstr
 
             return data;
         } catch (Exception e) {
-            throw new SerialisationException(e);
+            throw new SerializationException(e);
         }
 
     }

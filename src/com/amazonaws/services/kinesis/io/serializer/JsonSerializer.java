@@ -1,4 +1,4 @@
-package com.amazonaws.services.kinesis.io.serialiser;
+package com.amazonaws.services.kinesis.io.serializer;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * Class which handles serialising Object payloads using Jackson marshalling, or converts to string format if configured to support text based payloads
  */
-public class JsonSerialiser implements IKinesisSerialiser<Object, byte[]> {
+public class JsonSerializer implements IKinesisSerializer<Object, byte[]> {
     ObjectMapper mapper = new ObjectMapper();
 
     String itemTerminator = null;
@@ -30,7 +30,7 @@ public class JsonSerialiser implements IKinesisSerialiser<Object, byte[]> {
     /**
      * Construct a basic json data serialiser
      */
-    public JsonSerialiser() {
+    public JsonSerializer() {
     }
 
     /**
@@ -39,7 +39,7 @@ public class JsonSerialiser implements IKinesisSerialiser<Object, byte[]> {
      * 
      * @param itemTerminator
      */
-    public JsonSerialiser(String itemTerminator) {
+    public JsonSerializer(String itemTerminator) {
         this.itemTerminator = itemTerminator;
     }
 
@@ -48,7 +48,7 @@ public class JsonSerialiser implements IKinesisSerialiser<Object, byte[]> {
      * 
      * @param clazz
      */
-    public JsonSerialiser(Class clazz) {
+    public JsonSerializer(Class clazz) {
         this.clazz = clazz;
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
@@ -97,9 +97,9 @@ public class JsonSerialiser implements IKinesisSerialiser<Object, byte[]> {
      */
     public byte[] fromClass(final Object o) throws IOException {
         if (this.clazz == null) {
-            return SerialisationUtils.safeReturnData(((String) o).getBytes(this.charset));
+            return SerializationUtils.safeReturnData(((String) o).getBytes(this.charset));
         } else {
-            return SerialisationUtils.safeReturnData(mapper.writeValueAsBytes(o));
+            return SerializationUtils.safeReturnData(mapper.writeValueAsBytes(o));
         }
     }
 
@@ -110,7 +110,7 @@ public class JsonSerialiser implements IKinesisSerialiser<Object, byte[]> {
      * @param regex
      * @return
      */
-    public JsonSerialiser withFilterRegex(String regex) {
+    public JsonSerializer withFilterRegex(String regex) {
         this.filterRegex = regex;
         p = Pattern.compile(this.filterRegex);
 
@@ -124,7 +124,7 @@ public class JsonSerialiser implements IKinesisSerialiser<Object, byte[]> {
      * @param charset
      * @return
      */
-    public JsonSerialiser withCharset(String charset) {
+    public JsonSerializer withCharset(String charset) {
         // test that this is a valid character set
         Charset test = Charset.forName(charset);
 
@@ -140,7 +140,7 @@ public class JsonSerialiser implements IKinesisSerialiser<Object, byte[]> {
      * @param itemTerminator
      * @return
      */
-    public JsonSerialiser withItemTerminator(String itemTerminator) {
+    public JsonSerializer withItemTerminator(String itemTerminator) {
         this.itemTerminator = itemTerminator;
         return this;
     }

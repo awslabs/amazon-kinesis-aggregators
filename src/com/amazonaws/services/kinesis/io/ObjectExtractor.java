@@ -19,12 +19,12 @@ import com.amazonaws.services.kinesis.aggregators.StreamAggregator;
 import com.amazonaws.services.kinesis.aggregators.StreamAggregatorUtils;
 import com.amazonaws.services.kinesis.aggregators.annotations.AnnotationProcessor;
 import com.amazonaws.services.kinesis.aggregators.exception.InvalidConfigurationException;
-import com.amazonaws.services.kinesis.aggregators.exception.SerialisationException;
+import com.amazonaws.services.kinesis.aggregators.exception.SerializationException;
 import com.amazonaws.services.kinesis.aggregators.exception.UnsupportedCalculationException;
 import com.amazonaws.services.kinesis.aggregators.summary.SummaryConfiguration;
 import com.amazonaws.services.kinesis.aggregators.summary.SummaryElement;
-import com.amazonaws.services.kinesis.io.serialiser.IKinesisSerialiser;
-import com.amazonaws.services.kinesis.io.serialiser.JsonSerialiser;
+import com.amazonaws.services.kinesis.io.serializer.IKinesisSerializer;
+import com.amazonaws.services.kinesis.io.serializer.JsonSerializer;
 
 /**
  * IDataExtractor which supports extracting data from Objects via reflected
@@ -56,7 +56,7 @@ public class ObjectExtractor extends AbstractDataExtractor implements IDataExtra
 
     private Map<String, Double> sumUpdates = new HashMap<>();
 
-    private IKinesisSerialiser<Object, byte[]> serialiser;
+    private IKinesisSerializer<Object, byte[]> serialiser;
 
     private List<AggregateData> data;
 
@@ -82,7 +82,7 @@ public class ObjectExtractor extends AbstractDataExtractor implements IDataExtra
         this.summaryConfig = p.getSummaryConfig();
 
         this.clazz = clazz;
-        this.serialiser = new JsonSerialiser(clazz);
+        this.serialiser = new JsonSerializer(clazz);
     }
 
     /**
@@ -110,11 +110,11 @@ public class ObjectExtractor extends AbstractDataExtractor implements IDataExtra
      *        the base class.
      */
     public ObjectExtractor(List<String> aggregateLabelMethodNames, Class clazz,
-            IKinesisSerialiser<Object, byte[]> serialiser) throws Exception {
+            IKinesisSerializer<Object, byte[]> serialiser) throws Exception {
         this.clazz = clazz;
 
         if (serialiser == null) {
-            this.serialiser = new JsonSerialiser(clazz);
+            this.serialiser = new JsonSerializer(clazz);
         } else {
             this.serialiser = serialiser;
         }
@@ -173,12 +173,12 @@ public class ObjectExtractor extends AbstractDataExtractor implements IDataExtra
      * {@inheritDoc}
      */
     @Override
-    public List<AggregateData> getData(InputEvent event) throws SerialisationException {
+    public List<AggregateData> getData(InputEvent event) throws SerializationException {
         if (!validated) {
             try {
                 validate();
             } catch (Exception e) {
-                throw new SerialisationException(e);
+                throw new SerializationException(e);
             }
         }
 
@@ -248,7 +248,7 @@ public class ObjectExtractor extends AbstractDataExtractor implements IDataExtra
                             String msg = String.format(
                                     "Unable to access  Summary %s due to NumberFormatException", s);
                             LOG.error(msg);
-                            throw new SerialisationException(msg);
+                            throw new SerializationException(msg);
                         }
                     }
                 }
@@ -258,7 +258,7 @@ public class ObjectExtractor extends AbstractDataExtractor implements IDataExtra
 
             return data;
         } catch (Exception e) {
-            throw new SerialisationException(e);
+            throw new SerializationException(e);
         }
     }
 

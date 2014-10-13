@@ -25,7 +25,7 @@ import com.amazonaws.services.kinesis.aggregators.datastore.DynamoDataStore;
 import com.amazonaws.services.kinesis.aggregators.datastore.DynamoQueryEngine.QueryKeyScope;
 import com.amazonaws.services.kinesis.aggregators.datastore.IDataStore;
 import com.amazonaws.services.kinesis.aggregators.exception.InvalidConfigurationException;
-import com.amazonaws.services.kinesis.aggregators.exception.SerialisationException;
+import com.amazonaws.services.kinesis.aggregators.exception.SerializationException;
 import com.amazonaws.services.kinesis.aggregators.idempotency.DefaultIdempotencyCheck;
 import com.amazonaws.services.kinesis.aggregators.idempotency.IIdempotencyCheck;
 import com.amazonaws.services.kinesis.aggregators.metrics.CloudWatchMetricsEmitter;
@@ -234,7 +234,7 @@ public class StreamAggregator implements IStreamAggregator {
         LOG.error(e);
     }
 
-    public void initialise(String shardId) throws Exception {
+    public void initialize(String shardId) throws Exception {
         // Set System properties to allow entity expansion of unlimited items in
         // response documents from AWS API
         //
@@ -669,7 +669,7 @@ public class StreamAggregator implements IStreamAggregator {
                 // extract the data from the input event
                 try {
                     extractedItems = dataExtractor.getData(event);
-                } catch (SerialisationException se) {
+                } catch (SerializationException se) {
                     // customer may have elected to suppress serialisation
                     // errors if the stream is expected have heterogenous data
                     // on it
@@ -726,7 +726,7 @@ public class StreamAggregator implements IStreamAggregator {
             logInfo(String.format("Aggregation Complete - %s Records and %s Elements in %s ms",
                     aggregatedEventCount, aggregatedElementCount,
                     (System.currentTimeMillis() - start)));
-        } catch (SerialisationException se) {
+        } catch (SerializationException se) {
             shutdown(true, InventoryModel.STATE.SERIALISATION_ERROR);
             LOG.error(se);
             throw se;

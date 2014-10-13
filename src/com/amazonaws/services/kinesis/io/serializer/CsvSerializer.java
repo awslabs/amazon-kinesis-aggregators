@@ -1,4 +1,4 @@
-package com.amazonaws.services.kinesis.io.serialiser;
+package com.amazonaws.services.kinesis.io.serializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,8 +8,8 @@ import java.util.regex.Pattern;
 
 import com.amazonaws.services.kinesis.aggregators.InputEvent;
 
-public class CsvSerialiser extends StringSerialiser<CsvSerialiser> implements
-        IKinesisSerialiser<List<List<String>>, byte[]> {
+public class CsvSerializer extends StringSerializer<CsvSerializer> implements
+        IKinesisSerializer<List<List<String>>, byte[]> {
     private String delimiter = ",";
 
     private String itemTerminator = "\n";
@@ -62,7 +62,7 @@ public class CsvSerialiser extends StringSerialiser<CsvSerialiser> implements
             sb = new StringBuffer();
         }
 
-        return SerialisationUtils.safeReturnData(ret.substring(0, ret.length() - 1).getBytes(
+        return SerializationUtils.safeReturnData(ret.substring(0, ret.length() - 1).getBytes(
                 this.charset));
     }
 
@@ -72,7 +72,7 @@ public class CsvSerialiser extends StringSerialiser<CsvSerialiser> implements
      * @param delimiter
      * @return
      */
-    public CsvSerialiser withFieldDelimiter(String delimiter) {
+    public CsvSerializer withFieldDelimiter(String delimiter) {
         this.delimiter = delimiter;
         return this;
     }
@@ -84,7 +84,7 @@ public class CsvSerialiser extends StringSerialiser<CsvSerialiser> implements
      * @param regex
      * @return
      */
-    public CsvSerialiser withFilterRegex(String regex) {
+    public CsvSerializer withFilterRegex(String regex) {
         this.filterRegex = regex;
         p = Pattern.compile(this.filterRegex);
 

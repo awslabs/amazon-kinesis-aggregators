@@ -62,9 +62,9 @@ public class AggregatorGroup implements IStreamAggregator {
     }
 
     @Override
-    public void initialise(String shardId) throws Exception {
+    public void initialize(String shardId) throws Exception {
         for (IStreamAggregator agg : aggregators) {
-            agg.initialise(shardId);
+            agg.initialize(shardId);
         }
     }
 

@@ -1,4 +1,4 @@
-package com.amazonaws.services.kinesis.io.serialiser;
+package com.amazonaws.services.kinesis.io.serializer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,15 +8,15 @@ import java.util.regex.Pattern;
 
 import com.amazonaws.services.kinesis.aggregators.InputEvent;
 
-public class RegexSerialiser extends StringSerialiser<RegexSerialiser> implements
-        IKinesisSerialiser<List<List<String>>, byte[]> {
+public class RegexSerializer extends StringSerializer<RegexSerializer> implements
+        IKinesisSerializer<List<List<String>>, byte[]> {
     private String regexPattern;
 
     private Pattern p;
 
     private Matcher m;
 
-    public RegexSerialiser(String regexPattern) {
+    public RegexSerializer(String regexPattern) {
         this.regexPattern = regexPattern;
         p = Pattern.compile(this.regexPattern);
     }

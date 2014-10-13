@@ -1,4 +1,4 @@
-package com.amazonaws.services.kinesis.io.serialiser;
+package com.amazonaws.services.kinesis.io.serializer;
 
 import java.io.IOException;
 
@@ -7,7 +7,7 @@ import java.io.IOException;
  * 
  * @author meyersi
  */
-public class SerialisationUtils {
+public class SerializationUtils {
     /**
      * Ensure that the generated binary representation will conform to Kinesis
      * wire format requirements

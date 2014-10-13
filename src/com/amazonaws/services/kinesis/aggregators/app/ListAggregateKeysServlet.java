@@ -105,7 +105,7 @@ public class ListAggregateKeysServlet extends AbstractQueryServlet {
         // initialise the aggregator group onto shard 'none' for this operation
         // - it may already be initialised
         try {
-            aggGroup.initialise("none");
+            aggGroup.initialize("none");
         } catch (Exception e) {
             throw new ServletException(e);
         }

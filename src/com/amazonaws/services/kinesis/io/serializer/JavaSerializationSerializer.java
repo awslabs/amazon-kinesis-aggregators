@@ -1,4 +1,4 @@
-package com.amazonaws.services.kinesis.io.serialiser;
+package com.amazonaws.services.kinesis.io.serializer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 import com.amazonaws.services.kinesis.aggregators.InputEvent;
 
-public class JavaSerialisationSerialiser implements IKinesisSerialiser<Object, byte[]>,
+public class JavaSerializationSerializer implements IKinesisSerializer<Object, byte[]>,
         Serializable {
     private static final long serialVersionUID = 2837410982374019823L;
 
@@ -44,7 +44,7 @@ public class JavaSerialisationSerialiser implements IKinesisSerialiser<Object, b
         try {
             out = new ObjectOutputStream(bos);
             out.writeObject(o);
-            return SerialisationUtils.safeReturnData(bos.toByteArray());
+            return SerializationUtils.safeReturnData(bos.toByteArray());
         } finally {
             try {
                 if (out != null) {

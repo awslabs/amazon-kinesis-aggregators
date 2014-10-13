@@ -34,7 +34,7 @@ public interface IStreamAggregator {
      * Initialise the Aggregator on a shard. Should be called by
      * IRecordProcessor.initialize().
      */
-    public void initialise(String shardId) throws Exception;
+    public void initialize(String shardId) throws Exception;
 
     /**
      * Terminate an Aggregator running, which will mark the process as offline

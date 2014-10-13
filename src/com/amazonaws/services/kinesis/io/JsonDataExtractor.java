@@ -17,10 +17,10 @@ import com.amazonaws.services.kinesis.aggregators.LabelSet;
 import com.amazonaws.services.kinesis.aggregators.StreamAggregator;
 import com.amazonaws.services.kinesis.aggregators.StreamAggregatorUtils;
 import com.amazonaws.services.kinesis.aggregators.exception.InvalidConfigurationException;
-import com.amazonaws.services.kinesis.aggregators.exception.SerialisationException;
+import com.amazonaws.services.kinesis.aggregators.exception.SerializationException;
 import com.amazonaws.services.kinesis.aggregators.exception.UnsupportedCalculationException;
 import com.amazonaws.services.kinesis.aggregators.summary.SummaryConfiguration;
-import com.amazonaws.services.kinesis.io.serialiser.JsonSerialiser;
+import com.amazonaws.services.kinesis.io.serializer.JsonSerializer;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class JsonDataExtractor extends AbstractDataExtractor implements IDataExtractor {
@@ -36,7 +36,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
 
     private Map<String, Double> sumUpdates = new HashMap<>();
 
-    private JsonSerialiser serialiser = new JsonSerialiser();
+    private JsonSerializer serialiser = new JsonSerializer();
 
     private JsonDataExtractor() {
     }
@@ -46,7 +46,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
         this.labelName = LabelSet.fromStringKeys(labelAttributes).getName();
     }
 
-    public JsonDataExtractor(List<String> labelAttributes, JsonSerialiser serialiser) {
+    public JsonDataExtractor(List<String> labelAttributes, JsonSerializer serialiser) {
         this(labelAttributes);
         this.serialiser = serialiser;
     }
@@ -55,7 +55,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
      * {@inheritDoc}
      */
     @Override
-    public List<AggregateData> getData(InputEvent event) throws SerialisationException {
+    public List<AggregateData> getData(InputEvent event) throws SerializationException {
         try {
             List<AggregateData> aggregateData = new ArrayList<>();
             Date dateValue = null;
@@ -106,7 +106,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
 
                     // bail on no date returned
                     if (dateString == null || dateString.equals(""))
-                        throw new SerialisationException(String.format(
+                        throw new SerializationException(String.format(
                                 "Unable to read date value attribute %s from JSON Content %s",
                                 dateValueAttribute, item));
 
@@ -121,7 +121,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
                             LOG.error(String.format(
                                     "Unable to create Date Value element from item '%s' due to invalid format as Epoch Seconds",
                                     dateValueAttribute));
-                            throw new SerialisationException(e);
+                            throw new SerializationException(e);
                         }
                     }
                 } else {
@@ -144,7 +144,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
                             LOG.error(String.format(
                                     "Unable to deserialise Summary '%s' due to NumberFormatException",
                                     s));
-                            throw new SerialisationException(nfe);
+                            throw new SerializationException(nfe);
                         }
                     }
                 }
@@ -154,7 +154,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
 
             return aggregateData;
         } catch (Exception e) {
-            throw new SerialisationException(e);
+            throw new SerializationException(e);
         }
     }
 
@@ -195,7 +195,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
         return this;
     }
 
-    public JsonDataExtractor withSerialiser(JsonSerialiser serialiser) {
+    public JsonDataExtractor withSerialiser(JsonSerializer serialiser) {
         this.serialiser = serialiser;
         return this;
     }

@@ -44,7 +44,7 @@ public class AggregatorProcessor implements IRecordProcessor {
         LOG.info("Initializing AggregatorProcessor for Shard: " + shardId);
         this.kinesisShardId = shardId;
         try {
-            this.agg.initialise(shardId);
+            this.agg.initialize(shardId);
         } catch (Exception e) {
             e.printStackTrace();
         }

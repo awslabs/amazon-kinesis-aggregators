@@ -5,7 +5,7 @@ import java.util.List;
 import com.amazonaws.services.kinesis.aggregators.AggregateData;
 import com.amazonaws.services.kinesis.aggregators.AggregatorType;
 import com.amazonaws.services.kinesis.aggregators.InputEvent;
-import com.amazonaws.services.kinesis.aggregators.exception.SerialisationException;
+import com.amazonaws.services.kinesis.aggregators.exception.SerializationException;
 import com.amazonaws.services.kinesis.aggregators.summary.SummaryConfiguration;
 
 /**
@@ -42,9 +42,9 @@ public interface IDataExtractor {
      * @param event The Kinesis Record data from which we want to extract data.
      * @return A list of ExtractedData elements which have been resolved from
      *         the input data.
-     * @throws SerialisationException
+     * @throws SerializationException
      */
-    public List<AggregateData> getData(InputEvent event) throws SerialisationException;
+    public List<AggregateData> getData(InputEvent event) throws SerializationException;
 
     /**
      * Set the type of aggregator which contains this IDataExtractor. Used to

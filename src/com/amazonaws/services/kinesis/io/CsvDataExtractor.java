@@ -2,7 +2,7 @@ package com.amazonaws.services.kinesis.io;
 
 import java.util.List;
 
-import com.amazonaws.services.kinesis.io.serialiser.CsvSerialiser;
+import com.amazonaws.services.kinesis.io.serializer.CsvSerializer;
 
 /**
  * IDataExtractor implementation which allows for extraction of data from
@@ -15,7 +15,7 @@ public class CsvDataExtractor extends StringDataExtractor<CsvDataExtractor> impl
 
     private static String itemTerminator = "\n";
 
-    private CsvSerialiser serialiser;
+    private CsvSerializer serialiser;
 
     /**
      * Create a new data extractor using the indicated index for the label value
@@ -28,14 +28,14 @@ public class CsvDataExtractor extends StringDataExtractor<CsvDataExtractor> impl
      */
     public CsvDataExtractor(List<Integer> labelIndicies) {
         super.labelIndicies = labelIndicies;
-        this.serialiser = new CsvSerialiser().withFieldDelimiter(delimiter).withItemTerminator(
+        this.serialiser = new CsvSerializer().withFieldDelimiter(delimiter).withItemTerminator(
                 itemTerminator);
         super.serialiser = serialiser;
     }
 
     public CsvDataExtractor(List<Integer> labelIndicies, String labelAttributeAlias,
             int dateValueIndex, String dateAttributeAlias, String fieldDelimiter,
-            CsvSerialiser serialiser) {
+            CsvSerializer serialiser) {
         super.labelIndicies = labelIndicies;
         super.labelAttributeAlias = labelAttributeAlias;
         super.dateValueIndex = dateValueIndex;
@@ -94,7 +94,7 @@ public class CsvDataExtractor extends StringDataExtractor<CsvDataExtractor> impl
      * @param serialiser
      * @return
      */
-    public CsvDataExtractor withSerialiser(CsvSerialiser serialiser) {
+    public CsvDataExtractor withSerialiser(CsvSerializer serialiser) {
         super.serialiser = serialiser;
         return this;
     }

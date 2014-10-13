@@ -5,7 +5,7 @@ import java.util.List;
 import com.amazonaws.services.kinesis.aggregators.AggregateData;
 import com.amazonaws.services.kinesis.aggregators.AggregatorType;
 import com.amazonaws.services.kinesis.aggregators.InputEvent;
-import com.amazonaws.services.kinesis.aggregators.exception.SerialisationException;
+import com.amazonaws.services.kinesis.aggregators.exception.SerializationException;
 import com.amazonaws.services.kinesis.aggregators.summary.SummaryConfiguration;
 
 /**
@@ -21,7 +21,7 @@ public abstract class AbstractDataExtractor implements IDataExtractor {
 
     public abstract String getDateValueName();
 
-    public abstract List<AggregateData> getData(InputEvent event) throws SerialisationException;
+    public abstract List<AggregateData> getData(InputEvent event) throws SerializationException;
 
     public abstract void validate() throws Exception;
 
