@@ -1,6 +1,12 @@
-Amazon Kinesis Aggregators
+# Amazon Kinesis Aggregators
 
-Amazon Kinesis Aggregators is a Java framework that enables the automatic creation of real-time aggregated time series data from Amazon Kinesis streams. You can use this data to answer questions such as ‘how many times per second has ‘x’ occurred’ or ‘what was the breakdown by hour over the day of the streamed data containing ‘y'. Using this framework, you simply describe the format of the data on your stream (CSV, JSON, and so on), the granularity of times series that you require (seconds, minutes, hours, and so on), and how the data elements that are streamed should be grouped; the framework handles all the time series calculations and data persistence. You then simply consume the time series aggregates in your application using Amazon DynamoDB, or interact with the time series using Amazon CloudWatch or a Web Query API. You can also analyze the data using Hive on Amazon Elastic MapReduce, or bulk import it to Amazon Redshift. The process runs as a standalone Kinesis Enabled Application which only requires configuration, or can be integrated into existing Amazon Kinesis applications.
+Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
+
+    http://aws.amazon.com/asl/
+
+Amazon Kinesis Aggregators is a Java framework which allows for the simple creation of real time aggregated time series data from data Streamed through Amazon Kinesis. This aggregate dataset can answer questions such as ‘how many times per second has ‘x’ occurred’ or ‘what was the breakdown by hour over the day of the streamed data containing ‘y'. 
 
 The data is stored in a time series based on how you aggregate it. A dataset aggregating Telecoms Call Data Records in DynamoDB might look like this:
 
@@ -173,8 +179,7 @@ The StreamAggregator class provides interfaces for querying the underlying data.
 
 Use the following interface to query for a specific label value and time period.
 
-```
-public Map<String, AttributeValue> queryValue(String label, Date dateValue, TimeHorizon h)
+```public Map<String, AttributeValue> queryValue(String label, Date dateValue, TimeHorizon h)
             throws Exception
 ```
 
@@ -184,15 +189,13 @@ This method takes the label you are interested in, as well as a Date for the dat
 
 Perhaps most commonly, you will query for data by Date range, based upon the date in the stream. To do this, use the following method:
 
-```
-public List<Map<String, AttributeValue>> queryByDate(Date dateValue, TimeHorizon h,
+```public List<Map<String, AttributeValue>> queryByDate(Date dateValue, TimeHorizon h,
             ComparisonOperator comp, int threads) throws Exception
 ```
 
 This method queries by the Date, TimeHorizon, and ComparisonOperator you select. For example, to find all hourly aggregates after 3pm, use:
 
-```
-dateValue=Date('2014-01-01 15:00:00'), TimeHorizon.HOUR, ComparisonOperator.GT
+```dateValue=Date('2014-01-01 15:00:00'), TimeHorizon.HOUR, ComparisonOperator.GT
 ```
 
 The Threads parameter is the number of threads used to do the query. This is due to the index being organized on Hash/Range of scatterPrefix/DateValue.
@@ -256,14 +259,13 @@ This causes the time series calculations to be done based upon the configuration
 
 ```void checkpoint()```
 
-This flushes the in-memory time series state to the backing data store. You must ensure that the aggregators are initialized correctly against the shard for the worker by calling this method in the existing KCL Application IRecordProcessor initialise() method:
+This flushes the in-memory time series state to the backing data store. You must ensure that the aggregators are initialized correctly against the shard for the worker by calling this method in the existing KCL Application IRecordProcessor initialize() method:
 
-```void initialise(String shardId)```
+```void initialize(String shardId)```
 
 You must also ensure that if the shutdown() method is invoked on your Amazon Kinesis application, you call:
 
 ```void shutdown(boolean flushState)```
-
 If the shutdown reason specified in the shutdown method for IRecordProcessor is ShutdownReason.ZOMBIE, set flushState to 'false' to allow the data to be re-aggregated by another worker. However, if the value is ShutdownReason.TERMINATE, you should flush the aggregator state on termination.
 
 ### Configuring Aggregators in Existing Applications
@@ -526,7 +528,7 @@ public interface IDataStore {
      * 
      * @throws Exception
      */
-    public void initialise() throws Exception;
+    public void initialize() throws Exception;
 
     /**
      * Method that is periodically invoked to allow the IDataStore to
@@ -574,3 +576,9 @@ public interface IMetricsEmitter {
     public void setRegion(Region region);
 }
 ```
+
+Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
+
+    http://aws.amazon.com/asl/
