@@ -140,9 +140,9 @@ You can also navigate an entity structure in JSON-formatted stream data using do
 
 We can access the calculated duration using a summary item of 'timeValues.durations.calculated'. These concepts can be combined into a mini specification:
 
-Example 1 - Calculate the min, max and sum of value 7 in a CSV stream, giving them friendly names - ["min(7) min-purchase-price","max(7) max-purchase-price","sum(7) total-sales]"
+Example 1 - Calculate the min, max and sum of value 7 in a CSV stream, giving them friendly names - ```["min(7) min-purchase-price","max(7) max-purchase-price","sum(7) total-sales]"```
 
-Example 2 - Calculate the sum and maximum value of the calculated duration in our JSON stream - ["sum(timeValues.durations.calculated)","max(timeValues.durations.calculated)"]
+Example 2 - Calculate the sum and maximum value of the calculated duration in our JSON stream -  ```["sum(timeValues.durations.calculated)","max(timeValues.durations.calculated)"]```
 
 ### Sample Configurations
 
