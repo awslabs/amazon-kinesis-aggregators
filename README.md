@@ -10,11 +10,11 @@ Amazon Kinesis Aggregators is a Java framework that enables the automatic creati
 
 The data is stored in a time series based on how you aggregate it. A dataset aggregating Telecoms Call Data Records in DynamoDB might look like this:
 
-http://meyersi-ire-aws.s3.amazonaws.com/KinesisDynamicAggregators/img/Screen%20Shot%202014-05-27%20at%2011.53.21.png
+https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/AmazonKinesisAggregators/img/DynamoTable.png
 
 The corresponding data in CloudWatch would look like this:
 
-https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/KinesisDynamicAggregators/img/Screen+Shot+2014-05-29+at+08.21.57.png
+https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/AmazonKinesisAggregators/img/CloudWatch.png
 
 ## Building Aggregators
 
