@@ -332,24 +332,14 @@ public class DynamoDataStore implements IDataStore {
 
         final SummaryCalculation calc = update.getCalculationApplied();
 
-        if (update.getWritesSoFar() == 0) {
-            // try an update to PUT the value if NOT EXISTS, to establish if we
-            // are
-            // the first writer for this key
-            expected = new HashMap<String, ExpectedAttributeValue>() {
-                {
-                    put(setAttribute, new ExpectedAttributeValue().withExists(false));
-                }
-            };
-        } else {
-            // the value has been updated previously, so we can do a conditional
-            // update
-            expected.put(
-                    setAttribute,
-                    new ExpectedAttributeValue().withComparisonOperator(
-                            calc.getDynamoComparisonOperator()).withValue(
-                            new AttributeValue().withN("" + update.getFinalValue())));
-        }
+        // try an update to PUT the value if NOT EXISTS, to establish if we
+        // are the first writer for this key
+        expected = new HashMap<String, ExpectedAttributeValue>() {
+            {
+                put(setAttribute, new ExpectedAttributeValue().withExists(false));
+            }
+        };
+
         req.setExpected(expected);
 
         try {

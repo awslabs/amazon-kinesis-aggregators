@@ -1,0 +1,23 @@
+[{"dataExtractor": "JSON",
+    "dateFormat": "",
+    "dateAttribute": "captureTs",
+    "labelItems": [
+      "segment"
+    ],
+    "namespace": "BySegment-Json",
+    "summaryItems": [
+      "max(pressure)",
+      "max(flowRate)",
+      "max(corrosionIndex)",
+      "min(lat) lat",
+      "min(lng) lng"
+    ],
+    "timeHorizons": [
+      "SECOND"
+    ],
+    "type": "SUM",
+    "emitMetrics":"true",
+    "writeIOPS":100,
+    "readIOPS":25
+  }
+]

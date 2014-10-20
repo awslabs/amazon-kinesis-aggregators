@@ -1,0 +1,26 @@
+[{"dataExtractor": "CSV",
+    "dateFormat": "",
+    "dateItem": 2,
+    "dateAttributeAlias":"sensorTS",
+    "labelItems": [
+      1
+    ],
+    "labelAttributeAlias":"segment",
+    "namespace": "BySegment-CSV",
+    "delimiter": "|",
+    "summaryItems": [
+      "max(5) max-pressure",
+      "max(6) max-flow",
+      "max(9) max-corrosion",
+      "min(3) lat",
+      "min(4) lng"
+    ],
+    "timeHorizons": [
+      "SECOND"
+    ],
+    "type": "SUM",
+    "emitMetrics":"true",
+    "writeIOPS":100,
+    "readIOPS":25
+  }
+]
