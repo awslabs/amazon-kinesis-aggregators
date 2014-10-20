@@ -37,4 +37,22 @@
 		<servlet-name>LabelQuery</servlet-name>
 		<url-pattern>/labelQuery</url-pattern>
 	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ConfigParams</servlet-name>
+		<servlet-class>com.amazonaws.services.kinesis.aggregators.app.FetchConfigurationServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ConfigParams</servlet-name>
+		<url-pattern>/configParams</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ConfigFile</servlet-name>
+		<servlet-class>com.amazonaws.services.kinesis.aggregators.app.ShowConfigFileServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ConfigFile</servlet-name>
+		<url-pattern>/configFile</url-pattern>
+	</servlet-mapping>
 </web-app>
