@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.amazonaws.services.kinesis.aggregators.AggregatorsConstants;
+import com.amazonaws.services.kinesis.aggregators.configuration.ConfigFileUtils;
 
 public class FetchConfigurationServlet extends AbstractQueryServlet {
     private void respondWith(HttpServletResponse response, Map<String, String> configItems)
@@ -39,7 +40,6 @@ public class FetchConfigurationServlet extends AbstractQueryServlet {
             }
         }
         w.print("}");
-
     }
 
     @Override
@@ -56,6 +56,9 @@ public class FetchConfigurationServlet extends AbstractQueryServlet {
                 System.getProperty(AggregatorsConstants.APP_NAME_PARAM));
         config.put(AggregatorsConstants.CONFIG_URL_PARAM,
                 System.getProperty(AggregatorsConstants.CONFIG_URL_PARAM));
+        config.put(
+                "fetch-config-url",
+                ConfigFileUtils.makeConfigFileURL(System.getProperty(AggregatorsConstants.CONFIG_URL_PARAM)));
 
         // optional items
         config.put(AggregatorsConstants.ENVIRONMENT_PARAM,

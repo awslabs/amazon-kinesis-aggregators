@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.kinesis.aggregators.AggregatorsConstants;
+import com.amazonaws.services.kinesis.aggregators.configuration.ConfigFileUtils;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
@@ -28,30 +29,10 @@ public class ShowConfigFileServlet extends AbstractQueryServlet {
         if (configUrl == null) {
             response.setStatus(404);
         } else {
-            if (configUrl.startsWith("http")) {
-                url = configUrl;
-            } else {
-                AmazonS3 s3Client = new AmazonS3Client();
-                String bucket = configUrl.split("/")[2];
-                String prefix = configUrl.substring(configUrl.indexOf(bucket) + bucket.length() + 1);
+            url = ConfigFileUtils.makeConfigFileURL(configUrl);
+            LOG.info(String.format("Sending Redirect for Config File to S3 Temporary URL %s", url));
 
-                // generate a presigned url for X hours
-                Date expiration = new Date();
-                long msec = expiration.getTime();
-                msec += 1000 * 60 * 60; // 1 hour.
-                expiration.setTime(msec);
-
-                GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(
-                        bucket, prefix);
-                generatePresignedUrlRequest.setMethod(HttpMethod.GET);
-                generatePresignedUrlRequest.setExpiration(expiration);
-
-                URL s3url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
-                url = s3url.toString();
-                LOG.info(String.format("Sending Redirect for Config File to S3 Temporary URL %s",
-                        url));
-            }
-
+            response.setHeader("Access-Control-Allow-Origin", "*");
             response.sendRedirect(url);
         }
     }
