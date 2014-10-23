@@ -24,16 +24,21 @@ public class ShowConfigFileServlet extends AbstractQueryServlet {
     @Override
     protected void doAction(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String configUrl = System.getProperty(AggregatorsConstants.CONFIG_URL_PARAM);
-        String url = null;
-        if (configUrl == null) {
-            response.setStatus(404);
-        } else {
-            url = ConfigFileUtils.makeConfigFileURL(configUrl);
-            LOG.info(String.format("Sending Redirect for Config File to S3 Temporary URL %s", url));
+        try {
+            String configUrl = System.getProperty(AggregatorsConstants.CONFIG_URL_PARAM);
+            String url = null;
+            if (configUrl == null) {
+                response.setStatus(404);
+            } else {
+                url = ConfigFileUtils.makeConfigFileURL(configUrl);
+                LOG.info(String.format("Sending Redirect for Config File to S3 Temporary URL %s",
+                        url));
 
-            response.setHeader("Access-Control-Allow-Origin", "*");
-            response.sendRedirect(url);
+                response.setHeader("Access-Control-Allow-Origin", "*");
+                response.sendRedirect(url);
+            }
+        } catch (Exception e) {
+            throw new ServletException(e);
         }
     }
 }

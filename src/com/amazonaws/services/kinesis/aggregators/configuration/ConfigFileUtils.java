@@ -9,12 +9,12 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 
 public class ConfigFileUtils {
-    public static final String makeConfigFileURL(String configUrl) {
+    public static final String makeConfigFileURL(String configUrl) throws Exception {
         String url = null;
 
         if (configUrl.startsWith("http")) {
             url = configUrl;
-        } else {
+        } else if (configUrl.startsWith("s3")) {
             AmazonS3 s3Client = new AmazonS3Client();
             String bucket = configUrl.split("/")[2];
             String prefix = configUrl.substring(configUrl.indexOf(bucket) + bucket.length() + 1);
@@ -32,6 +32,8 @@ public class ConfigFileUtils {
 
             URL s3url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
             url = s3url.toString();
+        } else {
+            url = new URL(String.format("file://%s", configUrl)).toString();
         }
 
         return url;

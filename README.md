@@ -10,11 +10,11 @@ Amazon Kinesis Aggregators is a Java framework that enables the automatic creati
 
 The data is stored in a time series based on how you aggregate it. A dataset aggregating Telecoms Call Data Records in DynamoDB might look like this:
 
-![Dynamo Real Time Aggregate Table](https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/AmazonKinesisAggregators/img/DynamoTable.png)
+![Dynamo Real Time Aggregate Table](https://s3-us-east-1.amazonaws.com/amazon-kinesis-aggregators/img/DynamoTable.png)
 
 The corresponding data in CloudWatch would look like this:
 
-![CloudWatch Dashboard View](https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/AmazonKinesisAggregators/img/CloudWatch.png)
+![CloudWatch Dashboard View](https://s3-us-east-1.amazonaws.com/amazon-kinesis-aggregators/img/CloudWatch.png)
 
 ## Building Aggregators
 
@@ -146,10 +146,10 @@ Example 2 - Calculate the sum and maximum value of the calculated duration in ou
 
 ### Sample Configurations
 
-* **JSON** - https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/AmazonKinesisAggregators/sample/json-aggregator.json
-* **CSV** - https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/AmazonKinesisAggregators/sample/csv-aggregator.json
-* **Regular Expression** - https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/AmazonKinesisAggregators/sample/regex-aggregator.json
-* **Object Serialized Data** - https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/AmazonKinesisAggregators/sample/object-aggregator.json
+* **JSON** - https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/KinesisDynamicAggregators/sample/json-aggregator.json
+* **CSV** - https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/KinesisDynamicAggregators/sample/csv-aggregator.json
+* **Regular Expression** - https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/KinesisDynamicAggregators/sample/regex-aggregator.json
+* **Object Serialized Data** - https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/KinesisDynamicAggregators/sample/object-aggregator.json
 
 ### Aggregator Data Structure
 

@@ -45,29 +45,33 @@ public class FetchConfigurationServlet extends AbstractQueryServlet {
     @Override
     protected void doAction(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Map<String, String> config = new HashMap<>();
+        try {
+            Map<String, String> config = new HashMap<>();
 
-        // required items
-        config.put(AggregatorsConstants.REGION_PARAM,
-                System.getProperty(AggregatorsConstants.REGION_PARAM));
-        config.put(AggregatorsConstants.STREAM_NAME_PARAM,
-                System.getProperty(AggregatorsConstants.STREAM_NAME_PARAM));
-        config.put(AggregatorsConstants.APP_NAME_PARAM,
-                System.getProperty(AggregatorsConstants.APP_NAME_PARAM));
-        config.put(AggregatorsConstants.CONFIG_URL_PARAM,
-                System.getProperty(AggregatorsConstants.CONFIG_URL_PARAM));
-        config.put(
-                "fetch-config-url",
-                ConfigFileUtils.makeConfigFileURL(System.getProperty(AggregatorsConstants.CONFIG_URL_PARAM)));
+            // required items
+            config.put(AggregatorsConstants.REGION_PARAM,
+                    System.getProperty(AggregatorsConstants.REGION_PARAM));
+            config.put(AggregatorsConstants.STREAM_NAME_PARAM,
+                    System.getProperty(AggregatorsConstants.STREAM_NAME_PARAM));
+            config.put(AggregatorsConstants.APP_NAME_PARAM,
+                    System.getProperty(AggregatorsConstants.APP_NAME_PARAM));
+            config.put(AggregatorsConstants.CONFIG_URL_PARAM,
+                    System.getProperty(AggregatorsConstants.CONFIG_URL_PARAM));
+            config.put(
+                    "fetch-config-url",
+                    ConfigFileUtils.makeConfigFileURL(System.getProperty(AggregatorsConstants.CONFIG_URL_PARAM)));
 
-        // optional items
-        config.put(AggregatorsConstants.ENVIRONMENT_PARAM,
-                System.getProperty(AggregatorsConstants.ENVIRONMENT_PARAM));
-        config.put(AggregatorsConstants.MAX_RECORDS_PARAM,
-                System.getProperty(AggregatorsConstants.MAX_RECORDS_PARAM));
-        config.put(AggregatorsConstants.FAILURES_TOLERATED_PARAM,
-                System.getProperty(AggregatorsConstants.FAILURES_TOLERATED_PARAM));
+            // optional items
+            config.put(AggregatorsConstants.ENVIRONMENT_PARAM,
+                    System.getProperty(AggregatorsConstants.ENVIRONMENT_PARAM));
+            config.put(AggregatorsConstants.MAX_RECORDS_PARAM,
+                    System.getProperty(AggregatorsConstants.MAX_RECORDS_PARAM));
+            config.put(AggregatorsConstants.FAILURES_TOLERATED_PARAM,
+                    System.getProperty(AggregatorsConstants.FAILURES_TOLERATED_PARAM));
 
-        respondWith(response, config);
+            respondWith(response, config);
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
     }
 }
