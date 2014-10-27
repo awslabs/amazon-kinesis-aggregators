@@ -10,17 +10,17 @@ Amazon Kinesis Aggregators is a Java framework that enables the automatic creati
 
 The data is stored in a time series based on how you aggregate it. A dataset aggregating Telecoms Call Data Records in DynamoDB might look like this:
 
-![Dynamo Real Time Aggregate Table](https://s3-us-east-1.amazonaws.com/amazon-kinesis-aggregators/img/DynamoTable.png)
+![Dynamo Real Time Aggregate Table](https://s3.amazonaws.com/amazon-kinesis-aggregators/img/DynamoTable.png)
 
 The corresponding data in CloudWatch would look like this:
 
-![CloudWatch Dashboard View](https://s3-us-east-1.amazonaws.com/amazon-kinesis-aggregators/img/CloudWatch.png)
+![CloudWatch Dashboard View](https://s3.amazonaws.com/amazon-kinesis-aggregators/img/CloudWatch.png)
 
 ## Building Aggregators
 
 Amazon Kinesis Aggregators is built using Apache Maven. To build, simply run Maven from the amazon-kinesis-aggregators directory. The target directory contains the following build artifacts:
 
-* **amazon-kinesis-aggregators-<version>.jar** - Includes no compiled dependencies
+* **amazon-kinesis-aggregators-.9.2.6.4.jar** - Includes no compiled dependencies
 * **AmazonKinesisAggregators.jar-complete.jar** - Includes all required dependencies
 * **AmazonKinesisAggregator.war** - The Web Application Archive 
 
