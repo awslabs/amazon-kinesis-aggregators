@@ -146,10 +146,10 @@ Example 2 - Calculate the sum and maximum value of the calculated duration in ou
 
 ### Sample Configurations
 
-* **JSON** - https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/KinesisDynamicAggregators/sample/json-aggregator.json
-* **CSV** - https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/KinesisDynamicAggregators/sample/csv-aggregator.json
-* **Regular Expression** - https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/KinesisDynamicAggregators/sample/regex-aggregator.json
-* **Object Serialized Data** - https://s3-eu-west-1.amazonaws.com/meyersi-ire-aws/KinesisDynamicAggregators/sample/object-aggregator.json
+* **JSON** - http://amazon-kinesis-aggregators.s3.amazonaws.com/sample/json-aggregator.json
+* **CSV** - http://amazon-kinesis-aggregators.s3.amazonaws.com/sample/csv-aggregator.json
+* **Regular Expression** - http://amazon-kinesis-aggregators.s3.amazonaws.com/sample/regex-aggregator.json
+* **Object Serialized Data** - http://amazon-kinesis-aggregators.s3.amazonaws.com/sample/object-aggregator.json
 
 ### Aggregator Data Structure
 
