@@ -129,28 +129,28 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.amazonaws</groupId>
-			<artifactId>amazon-kinesis-client</artifactId>
-			<version>LATEST</version>
-		</dependency>
-		<dependency>
-			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-dynamodb</artifactId>
-			<version>LATEST</version>
+			<version>1.9.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-kinesis</artifactId>
-			<version>LATEST</version>
+			<version>1.9.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-cloudwatch</artifactId>
-			<version>LATEST</version>
+			<version>1.9.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-cloudwatchmetrics</artifactId>
-			<version>LATEST</version>
+			<version>1.9.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>amazon-kinesis-client</artifactId>
+			<version>1.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -163,15 +163,9 @@
 			<version>3.1</version>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>LATEST</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
-			<version>LATEST</version>
+			<version>20040616</version>
 		</dependency>
 		<dependency>
 			<groupId>joda-time</groupId>
@@ -187,10 +181,9 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>LATEST</version>
+			<version>2.4</version>
 		</dependency>
 	</dependencies>
-
 	<organization>
 		<name>Amazon Web Services UK Ltd</name>
 	</organization>
