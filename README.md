@@ -206,6 +206,24 @@ The Threads parameter is the number of threads used to do the query. This is due
 ##### Web Based Query API
 The Aggregators Web Application also provides several query APIs, which return data in JSON format. When deployed, you can make an HTTP request to a variety of endpoints to retrieve different types of data.
 
+###### Viewing the Running Configuration
+
+You can view the Configuration of your Aggregators at URL ```<web application>/configuration```, which returns an object such as:
+
+```
+{
+    "region": "eu-west-1",
+    "environment": null,
+    "config-file-url": "s3://meyersi-ire/kinesis/sensor-consumer-regex.json",
+    "application-name": "EnergyRealTimeDataConsumer",
+    "max-records": "2500",
+    "stream-name": "EnergyPipelineSensors",
+    "failures-tolerated": null,
+    "position-in-stream": "LATEST",
+    "version": ".9.2.6.6"
+}
+```
+
 ###### Date Based Queries
 
 Use the Date query to find data that has been aggregated on the basis of the stream timestamp value. For example, use this interface to periodically retrieve all new data that has been processed, or to pull data for specific time ranges for comparative analysis. The URL is:

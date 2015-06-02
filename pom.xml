@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.amazonaws</groupId>
 	<artifactId>amazon-kinesis-aggregators</artifactId>
-	<version>.9.2.6.5</version>
+	<version>.9.2.6.6</version>
 	<properties>
 		<sdk-version>1.9.39</sdk-version>
 	</properties>

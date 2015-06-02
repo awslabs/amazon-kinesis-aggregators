@@ -48,6 +48,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>Configuration</servlet-name>
+		<servlet-class>com.amazonaws.services.kinesis.aggregators.app.ShowConfigurationServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Configuration</servlet-name>
+		<url-pattern>/configuration</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>ConfigFile</servlet-name>
 		<servlet-class>com.amazonaws.services.kinesis.aggregators.app.ShowConfigFileServlet</servlet-class>
 	</servlet>
