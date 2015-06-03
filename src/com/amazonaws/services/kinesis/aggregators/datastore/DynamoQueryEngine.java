@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.BatchGetItemRequest;
@@ -385,8 +386,6 @@ public class DynamoQueryEngine {
 	}
 
 	private class ParallelDateQueryWorker implements Runnable {
-		private List<Map<String, AttributeValue>> output = new ArrayList<>();
-
 		private int start, range;
 
 		private String tableName, indexName, labelAttribute, dateAttribute;
@@ -394,6 +393,8 @@ public class DynamoQueryEngine {
 		private Map<String, Condition> conditions;
 
 		private Exception exception;
+
+		private Map<String, Set<String>> resultKeys = new HashMap<>();
 
 		public void throwException() throws Exception {
 			if (this.exception != null)
@@ -414,6 +415,8 @@ public class DynamoQueryEngine {
 
 		@Override
 		public void run() {
+			List<Map<String, AttributeValue>> results = new ArrayList<>();
+
 			for (int i = this.start; i < this.start + this.range; i++) {
 				Condition c = new Condition().withComparisonOperator(
 						ComparisonOperator.EQ).withAttributeValueList(
@@ -435,7 +438,7 @@ public class DynamoQueryEngine {
 							result = dynamoClient.query(req)
 									.withLastEvaluatedKey(lastKeyEvaluated);
 
-							this.output.addAll(result.getItems());
+							results.addAll(result.getItems());
 						} catch (ProvisionedThroughputExceededException e) {
 							LOG.warn(String
 									.format("Provisioned Throughput Exceeded - Retry Attempt %s",
@@ -460,69 +463,66 @@ public class DynamoQueryEngine {
 
 					lastKeyEvaluated = result.getLastEvaluatedKey();
 				} while (lastKeyEvaluated != null);
-			}
-		}
 
-		/**
-		 * This method takes a query result on the GSI, and returns a
-		 * deduplicated set of hash/range values in the form of a Map indexed by
-		 * the label value, with one entry per date value
-		 * 
-		 * @return
-		 */
-		public KeysAndAttributes dedupExtractKeys() {
-			KeysAndAttributes keys = new KeysAndAttributes();
+				// pivot the results into a list of label values and set of date
+				// values
+				String labelValue = null;
+				String dateValue = null;
+				Set<String> values;
 
-			Map<String, Set<AttributeValue>> out = new HashMap<>();
-			String labelValue = null;
-			AttributeValue dateValue = null;
-			Set<AttributeValue> values;
-
-			// go through all of the output
-			for (Map<String, AttributeValue> map : this.output) {
-				// process each attribute
-				for (String s : map.keySet()) {
-					// grab the label and date values
-					if (s.equals(this.labelAttribute)) {
-						labelValue = map.get(s).getS();
-					} else if (s.equals(this.dateAttribute)) {
-						dateValue = map.get(s);
-					}
-				}
-
-				if (labelValue != null && dateValue != null) {
-					// get the current set of date values for the label, or
-					// create a new one
-					if (!out.containsKey(labelValue)) {
-						values = new HashSet<>();
-					} else {
-						values = out.get(labelValue);
-					}
-
-					// add the current date value to the set of all date values
-					// fore label
-					values.add(dateValue);
-
-					// write back the map of label to date values
-					out.put(labelValue, values);
-				}
-			}
-
-			// now pivot the deduplicated output key set into a
-			// KeysAndAttributes object
-			for (final String s : out.keySet()) {
-				for (final AttributeValue value : out.get(s)) {
-					keys.withKeys(new HashMap<String, AttributeValue>() {
-						{
-							put(labelAttribute, new AttributeValue().withS(s));
-							put(dateAttribute, value);
+				for (Map<String, AttributeValue> map : results) {
+					// process each attribute
+					for (String s : map.keySet()) {
+						// grab the label and date values
+						if (s.equals(this.labelAttribute)) {
+							labelValue = map.get(s).getS();
+						} else if (s.equals(this.dateAttribute)) {
+							dateValue = map.get(s).getS();
 						}
-					});
+					}
+
+					if (labelValue != null && dateValue != null) {
+						// get the current set of date values for the label, or
+						// create a new one
+						if (!resultKeys.containsKey(labelValue)) {
+							values = new HashSet<>();
+						} else {
+							values = resultKeys.get(labelValue);
+						}
+
+						// add the current date value to the set of all date
+						// values
+						// fore label
+						values.add(dateValue);
+
+						// write back the map of label to date values
+						resultKeys.put(labelValue, values);
+					}
 				}
 			}
-
-			return keys;
 		}
+
+		public Map<String, Set<String>> getResultKeys() {
+			return this.resultKeys;
+		}
+	}
+
+	private KeysAndAttributes convertResultKeys(
+			Map<String, Set<String>> resultKeys) {
+		KeysAndAttributes keys = new KeysAndAttributes();
+
+		for (final String s : resultKeys.keySet()) {
+			for (final String value : resultKeys.get(s)) {
+				keys.withKeys(new HashMap<String, AttributeValue>() {
+					{
+						put(labelAttribute, new AttributeValue().withS(s));
+						put(dateAttribute, new AttributeValue().withS(value));
+					}
+				});
+			}
+		}
+
+		return keys;
 	}
 
 	private List<Map<String, AttributeValue>> batchGetDataByKeys(
@@ -530,8 +530,15 @@ public class DynamoQueryEngine {
 		Map<String, KeysAndAttributes> requestMap = new HashMap<>();
 		keys.setConsistentRead(true);
 		requestMap.put(tableName, keys);
-		BatchGetItemResult result = dynamoClient
-				.batchGetItem(new BatchGetItemRequest(requestMap));
+
+		BatchGetItemResult result = null;
+		try {
+			result = dynamoClient.batchGetItem(new BatchGetItemRequest(
+					requestMap));
+		} catch (AmazonServiceException e) {
+			LOG.error(e);
+			throw e;
+		}
 
 		return result.getResponses().get(this.tableName);
 	}
@@ -592,22 +599,21 @@ public class DynamoQueryEngine {
 
 		// collect the results from the workers
 		int outputCounter = 0;
-		KeysAndAttributes queryKeys;
 
 		for (ParallelDateQueryWorker w : workers) {
 			// throw any exceptions that the worker handled
 			w.throwException();
 
-			queryKeys = new KeysAndAttributes();
-
 			// generate a set of KeysAndAttributes from the deduplicated output
 			// map of table keys
-			KeysAndAttributes workerKeys = w.dedupExtractKeys();
+			Map<String, Set<String>> workerKeys = w.getResultKeys();
+			KeysAndAttributes k = convertResultKeys(workerKeys);
 
-			// break the returned KeysAndAttributes up into batches of 25 and
+			// break the KeysAndAttributes up into batches of 25 and
 			// query for them
-			if (workerKeys != null && workerKeys.getKeys() != null) {
-				for (Map<String, AttributeValue> key : workerKeys.getKeys()) {
+			KeysAndAttributes queryKeys = new KeysAndAttributes();
+			if (k != null && k.getKeys() != null) {
+				for (Map<String, AttributeValue> key : k.getKeys()) {
 					queryKeys.withKeys(key);
 
 					outputCounter++;
@@ -619,7 +625,10 @@ public class DynamoQueryEngine {
 					}
 				}
 				// one final query for anything < mod(25)=0
-				output.addAll(batchGetDataByKeys(this.tableName, queryKeys));
+				if (queryKeys.getKeys() != null
+						&& queryKeys.getKeys().size() > 0) {
+					output.addAll(batchGetDataByKeys(this.tableName, queryKeys));
+				}
 			}
 		}
 
