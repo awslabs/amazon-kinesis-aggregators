@@ -37,121 +37,126 @@ import com.amazonaws.services.kinesis.model.Record;
  * application.
  */
 public class AggregatorProcessor implements IRecordProcessor {
-    private static final Log LOG = LogFactory.getLog(AggregatorProcessor.class);
+	private static final Log LOG = LogFactory.getLog(AggregatorProcessor.class);
 
-    private final int NUM_RETRIES = 10;
+	private final int NUM_RETRIES = 10;
 
-    private final long BACKOFF_TIME_IN_MILLIS = 100L;
+	private final long BACKOFF_TIME_IN_MILLIS = 100L;
 
-    private String kinesisShardId;
+	private String kinesisShardId;
 
-    private IStreamAggregator agg;
+	private IStreamAggregator agg;
 
-    public AggregatorProcessor(IStreamAggregator agg) {
-        super();
-        this.agg = agg;
-    }
+	public AggregatorProcessor(IStreamAggregator agg) {
+		super();
+		this.agg = agg;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initialize(String shardId) {
-        LOG.info("Initializing AggregatorProcessor for Shard: " + shardId);
-        this.kinesisShardId = shardId;
-        try {
-            this.agg.initialize(shardId);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void initialize(String shardId) {
+		LOG.info("Initializing AggregatorProcessor for Shard: " + shardId);
+		this.kinesisShardId = shardId;
+		try {
+			this.agg.initialize(shardId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void processRecords(List<Record> records, IRecordProcessorCheckpointer checkpointer) {
-        LOG.info("Aggregating " + records.size() + " records for Kinesis Shard " + kinesisShardId);
-        try {
-            // run data into the aggregator
-            agg.aggregate(records);
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void processRecords(List<Record> records,
+			IRecordProcessorCheckpointer checkpointer) {
+		LOG.info("Aggregating " + records.size()
+				+ " records for Kinesis Shard " + kinesisShardId);
+		try {
+			// run data into the aggregator
+			agg.aggregate(records);
 
-            // checkpoint the aggregator and kcl
-            agg.checkpoint();
-            checkpointer.checkpoint();
+			// checkpoint the aggregator and kcl
+			agg.checkpoint();
+			checkpointer.checkpoint(records.get(records.size()));
 
-            LOG.debug("Kinesis Checkpoint for Shard " + kinesisShardId + " Complete");
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOG.error(e);
-            shutdown(checkpointer, ShutdownReason.ZOMBIE);
-        }
-    }
+			LOG.debug("Kinesis Checkpoint for Shard " + kinesisShardId
+					+ " Complete");
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error(e);
+			shutdown(checkpointer, ShutdownReason.ZOMBIE);
+		}
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void shutdown(IRecordProcessorCheckpointer checkpointer, ShutdownReason reason) {
-        LOG.info("Shutting down record processor for shard: " + kinesisShardId);
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void shutdown(IRecordProcessorCheckpointer checkpointer,
+			ShutdownReason reason) {
+		LOG.info("Shutting down record processor for shard: " + kinesisShardId);
 
-        // Important to checkpoint after reaching end of shard, so we can start
-        // processing data from child shards.
-        if (reason == ShutdownReason.TERMINATE) {
-            try {
-                agg.shutdown(true);
-                checkpoint(checkpointer);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            // shutdown the aggregator without flushing state
-            try {
-                agg.shutdown(false);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+		// Important to checkpoint after reaching end of shard, so we can start
+		// processing data from child shards.
+		if (reason == ShutdownReason.TERMINATE) {
+			try {
+				agg.shutdown(true);
+				checkpoint(checkpointer);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			// shutdown the aggregator without flushing state
+			try {
+				agg.shutdown(false);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-    /**
-     * Checkpoint with retries.
-     * 
-     * @param checkpointer
-     */
-    private void checkpoint(IRecordProcessorCheckpointer checkpointer) {
-        LOG.info("Checkpointing shard " + kinesisShardId);
-        for (int i = 0; i < NUM_RETRIES; i++) {
-            try {
-                checkpointer.checkpoint();
-                break;
-            } catch (ShutdownException se) {
-                // Ignore checkpoint if the processor instance has been shutdown
-                // (fail over).
-                LOG.info("Caught shutdown exception, skipping checkpoint.", se);
-                break;
-            } catch (ThrottlingException e) {
-                // Backoff and re-attempt checkpoint upon transient failures
-                if (i >= (NUM_RETRIES - 1)) {
-                    LOG.error("Checkpoint failed after " + (i + 1) + "attempts.", e);
-                    break;
-                } else {
-                    LOG.info("Transient issue when checkpointing - attempt " + (i + 1) + " of "
-                            + NUM_RETRIES, e);
-                }
-            } catch (InvalidStateException e) {
-                // This indicates an issue with the DynamoDB table (check for
-                // table, provisioned IOPS).
-                LOG.error(
-                        "Cannot save checkpoint to the DynamoDB table used by the KinesisClientLibrary.",
-                        e);
-                break;
-            }
-            try {
-                Thread.sleep(BACKOFF_TIME_IN_MILLIS);
-            } catch (InterruptedException e) {
-                LOG.debug("Interrupted sleep", e);
-            }
-        }
-    }
+	/**
+	 * Checkpoint with retries.
+	 * 
+	 * @param checkpointer
+	 */
+	private void checkpoint(IRecordProcessorCheckpointer checkpointer) {
+		LOG.info("Checkpointing shard " + kinesisShardId);
+		for (int i = 0; i < NUM_RETRIES; i++) {
+			try {
+				checkpointer.checkpoint();
+				break;
+			} catch (ShutdownException se) {
+				// Ignore checkpoint if the processor instance has been shutdown
+				// (fail over).
+				LOG.info("Caught shutdown exception, skipping checkpoint.", se);
+				break;
+			} catch (ThrottlingException e) {
+				// Backoff and re-attempt checkpoint upon transient failures
+				if (i >= (NUM_RETRIES - 1)) {
+					LOG.error("Checkpoint failed after " + (i + 1)
+							+ "attempts.", e);
+					break;
+				} else {
+					LOG.info("Transient issue when checkpointing - attempt "
+							+ (i + 1) + " of " + NUM_RETRIES, e);
+				}
+			} catch (InvalidStateException e) {
+				// This indicates an issue with the DynamoDB table (check for
+				// table, provisioned IOPS).
+				LOG.error(
+						"Cannot save checkpoint to the DynamoDB table used by the KinesisClientLibrary.",
+						e);
+				break;
+			}
+			try {
+				Thread.sleep(BACKOFF_TIME_IN_MILLIS);
+			} catch (InterruptedException e) {
+				LOG.debug("Interrupted sleep", e);
+			}
+		}
+	}
 }
