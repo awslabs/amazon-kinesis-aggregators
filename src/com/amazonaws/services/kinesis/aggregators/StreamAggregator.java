@@ -66,7 +66,7 @@ import com.amazonaws.services.kinesis.model.Record;
 public class StreamAggregator implements IStreamAggregator {
     public static final String AWSApplication = "AmazonKinesisAggregators";
 
-    public static final String version = ".9.2.6.8";
+    public static final String version = ".9.2.6.9";
 
     /**
      * The default column name for the aggregated value, if none is provided.

@@ -80,7 +80,7 @@ public class AggregatorProcessor implements IRecordProcessor {
 
 			// checkpoint the aggregator and kcl
 			agg.checkpoint();
-			checkpointer.checkpoint(records.get(records.size()-1));
+			checkpointer.checkpoint(records.get(records.size() - 1));
 
 			LOG.debug("Kinesis Checkpoint for Shard " + kinesisShardId
 					+ " Complete");
