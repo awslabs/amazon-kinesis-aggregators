@@ -127,8 +127,6 @@ public class ExternallyConfiguredAggregatorFactory {
 
             // configure metrics service on the aggregator if it's been
             // configured
-            // configure metrics service on the aggregator if it's been
-            // configured
             if (model.shouldEmitMetrics() || model.getMetricsEmitter() != null) {
                 if (model.getMetricsEmitter() != null) {
                     agg.withMetricsEmitter(model.getMetricsEmitter().newInstance());
