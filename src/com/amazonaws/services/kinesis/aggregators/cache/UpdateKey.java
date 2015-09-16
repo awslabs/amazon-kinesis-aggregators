@@ -16,7 +16,12 @@
  */
 package com.amazonaws.services.kinesis.aggregators.cache;
 
+import java.text.ParseException;
+import java.util.Date;
+
 import com.amazonaws.services.kinesis.aggregators.LabelSet;
+import com.amazonaws.services.kinesis.aggregators.StreamAggregator;
+import com.amazonaws.services.kinesis.aggregators.StreamAggregatorUtils;
 import com.amazonaws.services.kinesis.aggregators.TimeHorizon;
 
 /**
@@ -24,69 +29,79 @@ import com.amazonaws.services.kinesis.aggregators.TimeHorizon;
  * version of the AggregateTable.
  */
 public class UpdateKey {
-    private LabelSet labelValues;
+	private LabelSet labelValues;
 
-    private String dateAttribute;
+	private String dateAttribute;
 
-    private String dateValue;
+	private String dateValue;
 
-    private TimeHorizon timeHorizon;
+	private TimeHorizon timeHorizon;
 
-    public UpdateKey(LabelSet labelValues, String dateAttribute, String dateValue,
-            TimeHorizon timeHorizon) {
-        this.labelValues = labelValues;
-        this.dateAttribute = dateAttribute;
-        this.dateValue = dateValue;
-        this.timeHorizon = timeHorizon;
-    }
+	public UpdateKey(LabelSet labelValues, String dateAttribute,
+			String dateValue, TimeHorizon timeHorizon) {
+		this.labelValues = labelValues;
+		this.dateAttribute = dateAttribute;
+		this.dateValue = dateValue;
+		this.timeHorizon = timeHorizon;
+	}
 
-    public String getAggregateColumnName() {
-        return this.labelValues.getName();
-    }
+	public String getAggregateColumnName() {
+		return this.labelValues.getName();
+	}
 
-    public String getDateValueColumnName() {
-        return this.dateAttribute;
-    }
+	public String getDateValueColumnName() {
+		return this.dateAttribute;
+	}
 
-    public String getAggregatedValue() {
-        return this.labelValues.valuesAsString();
-    }
+	public String getAggregatedValue() {
+		return this.labelValues.valuesAsString();
+	}
 
-    public String getDateValue() {
-        return this.dateValue;
-    }
+	public String getDateValue() {
+		return this.dateValue;
+	}
 
-    public TimeHorizon getTimeHorizon() {
-        return this.timeHorizon;
-    }
+	public Date getDateValueAsDate() throws ParseException {
+		return StreamAggregator.dateFormatter.parse(StreamAggregatorUtils
+				.extractDateFromMultivalue(this.getTimeHorizon(),
+						this.getDateValue()));
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null)
-            return false;
+	public TimeHorizon getTimeHorizon() {
+		return this.timeHorizon;
+	}
 
-        if (!(o instanceof UpdateKey))
-            return false;
+	@Override
+	public boolean equals(Object o) {
+		if (o == null)
+			return false;
 
-        UpdateKey other = (UpdateKey) o;
-        if (this.labelValues.equals(other.labelValues) && this.dateValue.equals(other.dateValue)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+		if (!(o instanceof UpdateKey))
+			return false;
 
-    @Override
-    public int hashCode() {
-        int res = 17;
-        res = 31 * res + (this.labelValues == null ? 0 : this.labelValues.hashCode());
-        res = 31 * res + (this.dateValue == null ? 0 : this.dateValue.hashCode());
-        return res;
-    }
+		UpdateKey other = (UpdateKey) o;
+		if (this.labelValues.equals(other.labelValues)
+				&& this.dateValue.equals(other.dateValue)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
-    @Override
-    public String toString() {
-        return String.format("Update Key - Date Value: %s, Date Column: %s, Label Values: %s",
-                this.dateValue, this.dateAttribute, this.labelValues);
-    }
+	@Override
+	public int hashCode() {
+		int res = 17;
+		res = 31 * res
+				+ (this.labelValues == null ? 0 : this.labelValues.hashCode());
+		res = 31 * res
+				+ (this.dateValue == null ? 0 : this.dateValue.hashCode());
+		return res;
+	}
+
+	@Override
+	public String toString() {
+		return String
+				.format("Update Key - Date Value: %s, Date Column: %s, Label Values: %s",
+						this.dateValue, this.dateAttribute, this.labelValues);
+	}
 }

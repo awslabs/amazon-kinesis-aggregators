@@ -79,8 +79,7 @@ public class CloudWatchMetricsEmitter implements IMetricsEmitter {
 					return;
 				} else {
 					try {
-						metricDate = StreamAggregator.dateFormatter.parse(key
-								.getDateValue());
+						metricDate = key.getDateValueAsDate();
 					} catch (ParseException pe) {
 						LOG.error(String.format(
 								"Unable to Parse Date Value %s",
