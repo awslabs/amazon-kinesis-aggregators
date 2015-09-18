@@ -291,7 +291,8 @@ public class AggregateCache {
 		// put some nags into the log to remind an implementer to checkpoint
 		// periodically
 		if (reportUpdatesPendingCount != -1) {
-			if (pendingUpdates.size() % reportUpdatesPendingCount == 0) {
+			if ((reportUpdatesPendingCount != 0) &&
+				(pendingUpdates.size() % reportUpdatesPendingCount == 0)) {
 				logInfo(String.format("%s Pending Aggregates to be flushed",
 						pendingUpdates.size()));
 			}
