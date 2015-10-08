@@ -154,8 +154,13 @@ public class JsonDataExtractor extends AbstractDataExtractor implements IDataExt
 
                             // if a summary is not found in the data element,
                             // then we simply continue without it
-                            if (summary != null)
-                                sumUpdates.put(s, Double.parseDouble(summary));
+                            if (summary != null) {
+                                //StreamAggregatorUtils.readValueAsString returns "" if
+                                //attribute is not found.
+                                if (!summary.equals("")) {
+                                    sumUpdates.put(s, Double.parseDouble(summary));
+                                }
+                            }
                         } catch (NumberFormatException nfe) {
                             LOG.error(String.format(
                                     "Unable to deserialise Summary '%s' due to NumberFormatException",
