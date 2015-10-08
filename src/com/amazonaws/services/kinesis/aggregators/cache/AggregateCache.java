@@ -198,7 +198,7 @@ public class AggregateCache {
 	protected void setCheckpointForcingThresholds() throws Exception {
 		// set the force checkpoint level @ 4 minutes of write capacity, warning
 		// at half that, and info an half the warning threshold
-		if (this.dataStore.refreshForceCheckpointThresholds() != 0) {
+		if (this.dataStore.refreshForceCheckpointThresholds() > 0) {
 			this.forceCheckpointOnPendingUpdateCount = this.dataStore
 					.refreshForceCheckpointThresholds();
 			this.warnUpdatesPendingCount = (long) Math
@@ -290,14 +290,14 @@ public class AggregateCache {
 
 		// put some nags into the log to remind an implementer to checkpoint
 		// periodically
-		if (reportUpdatesPendingCount != -1) {
+		if (reportUpdatesPendingCount > 0) {
 			if (pendingUpdates.size() % reportUpdatesPendingCount == 0) {
 				logInfo(String.format("%s Pending Aggregates to be flushed",
 						pendingUpdates.size()));
 			}
 		}
 
-		if (warnUpdatesPendingCount != -1) {
+		if (warnUpdatesPendingCount > 0) {
 			if (pendingUpdates.size() > warnUpdatesPendingCount) {
 				logWarn(String.format(
 						"Warning - %s Pending Aggregates - Checkpoint NOW",
@@ -307,7 +307,7 @@ public class AggregateCache {
 
 		// checkpoint manually at the force threshold to prevent the aggregator
 		// falling over
-		if (forceCheckpointOnPendingUpdateCount != -1) {
+		if (forceCheckpointOnPendingUpdateCount > 0) {
 			if (pendingUpdates.size() > forceCheckpointOnPendingUpdateCount) {
 				logWarn(String
 						.format("Forcing checkpoint at %s Aggregates to avoid KCL Worker Disconnect - please ensure you have checkpointed the enclosing IRecordProcessor",

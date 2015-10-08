@@ -17,6 +17,7 @@
 package com.amazonaws.services.kinesis.aggregators.cache;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 
 import com.amazonaws.services.kinesis.aggregators.LabelSet;
@@ -36,6 +37,8 @@ public class UpdateKey {
 	private String dateValue;
 
 	private TimeHorizon timeHorizon;
+
+	private Calendar cal = Calendar.getInstance();
 
 	public UpdateKey(LabelSet labelValues, String dateAttribute,
 			String dateValue, TimeHorizon timeHorizon) {
@@ -62,9 +65,15 @@ public class UpdateKey {
 	}
 
 	public Date getDateValueAsDate() throws ParseException {
-		return StreamAggregator.dateFormatter.parse(StreamAggregatorUtils
-				.extractDateFromMultivalue(this.getTimeHorizon(),
-						this.getDateValue()));
+		// instrument the FOREVER metric at current time
+		if (this.getTimeHorizon().equals(TimeHorizon.FOREVER)) {
+			cal.setTimeInMillis(System.currentTimeMillis());
+			return cal.getTime();
+		} else {
+			return StreamAggregator.dateFormatter.parse(StreamAggregatorUtils
+					.extractDateFromMultivalue(this.getTimeHorizon(),
+							this.getDateValue()));
+		}
 	}
 
 	public TimeHorizon getTimeHorizon() {
