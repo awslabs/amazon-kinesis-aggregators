@@ -49,8 +49,8 @@ public enum TimeHorizon {
                     new SimpleDateFormat("yyyy-MM-dd HH").format(forDate), bucket);
         }
     },
-    HOUR(2, "MM-dd HH:00:00", "H"), DAY(3, "MM-dd 00:00:00", "d"), MONTH(4, "MM-01 00:00:00", "M"), YEAR(
-            5, "01-01 00:00:00", "Y"), FOREVER(999, "", "*") {
+    HOUR(2, "MM-dd HH:00:00", "H"), DAY(3, "MM-dd 00:00:00", "d"), WEEK(4, "ww", "W"), MONTH(5, "MM-01 00:00:00", "M"), YEAR(
+            6, "01-01 00:00:00", "Y"), FOREVER(999, "", "*") {
         /**
          * Override the getValue method, as TimeHorizon.FOREVER is for all
          * values regardless of time period. We'll set the value to '*' as
