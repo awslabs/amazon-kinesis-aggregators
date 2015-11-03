@@ -17,10 +17,7 @@
 package com.amazonaws.services.kinesis.aggregators;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public enum TimeHorizon {
     SECOND(0, "MM-dd HH:mm:ss", "s"), MINUTE(1, "MM-dd HH:mm:00", "m"), MINUTES_GROUPED(1, null,
@@ -75,7 +72,9 @@ public enum TimeHorizon {
     private String abbrev;
 
     private SimpleDateFormat getMask() {
-        return new SimpleDateFormat("yyyy-" + this.mask);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-" + this.mask);
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return format;
     }
 
     public String getAbbrev() {
