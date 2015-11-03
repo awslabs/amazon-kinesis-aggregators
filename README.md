@@ -24,7 +24,7 @@ The corresponding data in CloudWatch would look like this:
 
 Amazon Kinesis Aggregators is built using Apache Maven. To build, simply run Maven from the amazon-kinesis-aggregators directory. The target directory contains the following build artifacts:
 
-* **amazon-kinesis-aggregators-.9.2.6.9.jar** - Includes no compiled dependencies
+* **amazon-kinesis-aggregators-.9.2.7.4.jar** - Includes no compiled dependencies
 * **AmazonKinesisAggregators.jar-complete.jar** - Includes all required dependencies
 * **AmazonKinesisAggregator.war** - The web application archive file
 
@@ -178,60 +178,29 @@ Of course, the table also includes any summary values that were added to the agg
 
 All aggregator data stores have global secondary indexes (logically) on the date value and on lastWriteSeq. To ensure adequate write performance, these indexes are structured as hash/range on the scatterPrefix (a random number between 0 and 99) and the value is indexed.
 
-### Querying the Data
+#### Web-based Query API
 
-The StreamAggregator class provides interfaces for querying the underlying data. The first is used to query for a specific data value from the aggregate table. The second is used to query based upon the date range with conditional logic.
+The Amazon Kinesis Aggregators web application also provides several query API operations, which return data in the JSON format. When deployed, you can make an HTTP request to a variety of endpoints to retrieve different types of data. Currently, there is no security offered for the Web API operations, so you must ensure that they are only accessible from within your VPC using security group rules or similar. Do NOT make these endpoints publicly accessible.
 
-#### Querying for a Specific Aggregate
-
-Use the following interface to query for a specific label value and time period.
-
-```
-public Map<String, AttributeValue> queryValue(String label, Date dateValue, TimeHorizon h)
-throws Exception
-```
-
-This method takes the label you are interested in, as well as a date for the date value. If you have multiple TimeHorizon values configured on the aggregator, it generates the correct dateValue to query the underlying table with. You are likely to use this interface to query across aggregator data stores looking for related time-based values.
-
-#### Querying for Data by Date
-
-Perhaps most commonly, you will query for data by date range, based upon the date in the stream. To do this, use the following method:
-
-```
-public List<Map<String, AttributeValue>> queryByDate(Date dateValue, TimeHorizon h,
-ComparisonOperator comp, int threads) throws Exception
-```
-
-This method queries by the Date, TimeHorizon, and ComparisonOperator values you select. For example, to find all hourly aggregates after 3pm, use:
-
-```
-dateValue=Date('2014-01-01 15:00:00'), TimeHorizon.HOUR, ComparisonOperator.GT
-```
-
-The Threads parameter is the number of threads used to do the query. This is due to the index being organized on hash/range of scatterPrefix/DateValue.
-
-##### Web-based Query API
-The Amazon Kinesis Aggregators web application also provides several query API operations, which return data in the JSON format. When deployed, you can make an HTTP request to a variety of endpoints to retrieve different types of data.
-
-###### Viewing the Running Configuration
+##### Viewing the Running Configuration
 
 You can view the configuration of your aggregators at the URL ```<web application>/configuration```, which returns an object such as:
 
 ```
 {
   "application-name": "EnergyRealTimeDataConsumer",
-  "config-file-url": "s3://meyersi-ire/kinesis/sensor-consumer-regex.json",
+  "config-file-url": "s3://mybucket/kinesis/sensor-consumer-regex.json",
   "environment": null,
   "failures-tolerated": null,
   "max-records": "2500",
   "position-in-stream": "LATEST",
   "region": "eu-west-1",
   "stream-name": "EnergyPipelineSensors",
-  "version": ".9.2.6.6"
+  "version": ".9.2.7.4"
 }
 ```
 
-###### Date-based Queries
+##### Date-based Queries
 
 Use the Date query to find data that has been aggregated on the basis of the stream timestamp value. For example, use this interface to periodically retrieve all new data that has been processed, or to pull data for specific time ranges for comparative analysis. The URL is:
 
@@ -248,7 +217,22 @@ Parameters:
 
 This returns all data from the aggregated table for the date period specified.
 
-###### Query for Label/Date Values
+You can also use the internal Java API:
+
+```
+public List<Map<String, AttributeValue>> queryByDate(Date dateValue, TimeHorizon h,
+ComparisonOperator comp, int threads) throws Exception
+```
+
+This method queries by the Date, TimeHorizon, and ComparisonOperator values you select. For example, to find all hourly aggregates after 3pm, use:
+
+```
+dateValue=Date('2014-01-01 15:00:00'), TimeHorizon.HOUR, ComparisonOperator.GT
+```
+
+The Threads parameter is the number of threads used to do the query. This is due to the index being organized on hash/range of scatterPrefix/DateValue.
+
+##### Query for Label/Date Values
 
 To query the application to find the unique set of labels and date values that have been aggregated, use the following URL:
 
@@ -261,9 +245,16 @@ Parameters:
 
 This returns a unique list of all keys from the aggregated table.
 
-Currently, there is no security offered for the Web API operations, so you must ensure that they are only accessible from within your VPC using security group rules or similar. Do NOT make these endpoints publicly accessible.
+You can also use the internal Java API:
 
-## Integrating Aggregators into Existing Applications
+```
+public Map<String, AttributeValue> queryValue(String label, Date dateValue, TimeHorizon h)
+throws Exception
+```
+
+This method takes the label you are interested in, as well as a date for the date value. If you have multiple TimeHorizon values configured on the aggregator, it generates the correct dateValue to query the underlying table with. You are likely to use this interface to query across aggregator data stores looking for related time-based values.
+
+## Integrating Aggregators into Existing Java Applications
 
 In addition to running aggregators as stand-alone Amazon Kinesis applications, you can integrate them into existing Amazon Kinesis applications. You can:
 
