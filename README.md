@@ -88,19 +88,19 @@ Note that aggregatorDef*N* is an aggregator configuration. An aggregator configu
 * **labelAttributeAlias** (String) - Enables you to name the target database attribute for the label. This is particularly useful when you are using CSV or regex-extracted data, and would otherwise end up with a label attribute named the same as the label attribute index.
 * **type** (enum) - The type of aggregation to run. The available types are 'COUNT' and 'SUM'. Counting aggregators simply counts the instances of unique values in Label Items by time. Using the previous example, it would generate a count of searches by configured time period for each unique combination of Make, Model, and Year. Building on this 'SUM' type, aggregators also calculate summaries of other numeric values on the stream. For more information, see the configuration option **'summaryItems**'.
 * **timeHorizons** (array&lt;enum&gt;) - Because the data is captured as a time series, you must tell the aggregator which definition of time you require. To have the data on the stream aggregated by minute, specify 'MINUTE'. To put data into buckets of 5 minutes duration, specify MINUTES_GROUPED(5). You can specify multiple timeHorizon values, and the aggregator automatically maintains the time series data at that granularity. A common configuration might be ["SECOND","HOUR","FOREVER"], which gives per-second aggregates, a rollup by Hour, and a simple data set to view everything that ever occurred in a single value. The possible values are:
-* SECOND
-* MINUTE
-* MINUTES\_GROUPED(int minutePeriod) - Groups data into time buckets using a minute period. For 4 buckets per hour, use '15', or use '5' for buckets of aggregation that are 5 minutes long.
-* HOUR
-* DAY
-* MONTH
-* YEAR
-* FOREVER - Rolls up everything that occurred in a single value '*'. 
+  * SECOND
+  * MINUTE
+  * MINUTES\_GROUPED(int minutePeriod) - Groups data into time buckets using a minute period. For 4 buckets per hour, use '15', or use '5' for buckets of aggregation that are 5 minutes long.
+  * HOUR
+  * DAY
+  * MONTH
+  * YEAR
+  * FOREVER - Rolls up everything that occurred in a single value '*'. 
 * **dataExtractor** (enum) - Tells the aggregator how to parse and extract the Label Items from your stream. Currently, the following data formats are supported for external configurations using the configuration file:
-* **CSV** - Character-separated UTF-8 data. The default delimiter is a comma. To override the delimiter, set the configuration option 'delimiter' to the character value to use as the field terminator. Also, note that all data extractors support multi-value events. This means that you can have many CSV 'lines' within a single event, which are extracted with a line terminator of "\n". To override the line terminator on any data extractor that is text-based, set the configuration option 'lineTerminator' to the character to use as the line terminator. When this data extractor is used, indicate the Label Items using zero-index position values of the fields.
-* **JSON** - UTF-8 encoded JSON data. This data can either reside in a JSON array on the event (for example [{object1},{object2},{object3}]) or can be a single object per 'line' (for example {object1}\n {object2}). To control the object delimiter, use the configuration option 'lineTerminator'.
-* **REGEX** - UTF-8 encoded strings of arbitrary data. With this configuration option, you must include the 'regularExpression' configuration option. This data extraction method also uses zero-indexed positional values for Label Items.
-* **OBJECT** - Serialized objects using Jackson JSON binary data. With this configuration option, you must include the 'class' configuration option. Using this data extraction method, an event can include only 1 serialized object.
+  * **CSV** - Character-separated UTF-8 data. The default delimiter is a comma. To override the delimiter, set the configuration option 'delimiter' to the character value to use as the field terminator. Also, note that all data extractors support multi-value events. This means that you can have many CSV 'lines' within a single event, which are extracted with a line terminator of "\n". To override the line terminator on any data extractor that is text-based, set the configuration option 'lineTerminator' to the character to use as the line terminator. When this data extractor is used, indicate the Label Items using zero-index position values of the fields.
+  * **JSON** - UTF-8 encoded JSON data. This data can either reside in a JSON array on the event (for example [{object1},{object2},{object3}]) or can be a single object per 'line' (for example {object1}\n {object2}). To control the object delimiter, use the configuration option 'lineTerminator'.
+  * **REGEX** - UTF-8 encoded strings of arbitrary data. With this configuration option, you must include the 'regularExpression' configuration option. This data extraction method also uses zero-indexed positional values for Label Items.
+  * **OBJECT** - Serialized objects using Jackson JSON binary data. With this configuration option, you must include the 'class' configuration option. Using this data extraction method, an event can include only 1 serialized object.
 * **dateItem** (String) - The attribute or field index that defines when the event occurred. This is used to generate the aggregate for the correct time period for the event. This can be formatted as a long value of epoch seconds, or a String value. If you provide a String value in the event, you must also set the configuration option 'dateFormat'. If it is omitted, then the timestamp of the event is set to the timestamp of the server instance when it processes the item.
 * **dateAttributeAlias** (String) - Similar to labelAttributeAlias, this enables you to set the name of the date attribute in the aggregated data table.
 * **dateFormat** (String) - The date format of the dateItem, using date format strings as specified at ```http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html```.
@@ -131,16 +131,19 @@ Summary items can have aliases applied, as in SQL, to control the name of the ge
 
 You can also navigate an entity structure in a JSON-formatted stream data using dot notation; for example, given the following object, you can access the calculated duration using a summary item of 'timeValues.durations.calculated':
 
-```{"name":"Object To Be Aggregated",
-"timeValues": {
-"startTime":"01/01/1970 00:00:00",
-"endTime":"01/01/1970 01:00:00",
-"durations":{
-"recorded":58,
-"calculated":60
+```
+{
+  "name": "Object To Be Aggregated",
+  "timeValues": {
+    "durations": {
+      "calculated": 60,
+      "recorded": 58
+    },
+    "endTime": "01/01/1970 01:00:00",
+    "startTime": "01/01/1970 00:00:00"
+  }
 }
-}
-}```
+```
 
 These concepts can be combined into a mini-specification:
 
@@ -216,15 +219,15 @@ You can view the configuration of your aggregators at the URL ```<web applicatio
 
 ```
 {
-"region": "eu-west-1",
-"environment": null,
-"config-file-url": "s3://meyersi-ire/kinesis/sensor-consumer-regex.json",
-"application-name": "EnergyRealTimeDataConsumer",
-"max-records": "2500",
-"stream-name": "EnergyPipelineSensors",
-"failures-tolerated": null,
-"position-in-stream": "LATEST",
-"version": ".9.2.6.6"
+  "application-name": "EnergyRealTimeDataConsumer",
+  "config-file-url": "s3://meyersi-ire/kinesis/sensor-consumer-regex.json",
+  "environment": null,
+  "failures-tolerated": null,
+  "max-records": "2500",
+  "position-in-stream": "LATEST",
+  "region": "eu-west-1",
+  "stream-name": "EnergyPipelineSensors",
+  "version": ".9.2.6.6"
 }
 ```
 
