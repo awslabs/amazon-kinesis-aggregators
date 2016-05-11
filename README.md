@@ -40,7 +40,7 @@ Amazon Kinesis Aggregators ships with several deployment options, which should e
 
 Amazon Kinesis Aggregators compiles a web application archive (WAR) file, which enables easy deployment on Java application servers, such as Apache Tomcat, using Elastic Beanstalk (http://aws.amazon.com/elasticbeanstalk). Amazon Kinesis Aggregators also includes configuration options that instruct Elastic Beanstalk to scale the application on CPU load, which is typically the bottleneck for applications as they scale up. This is the recommended deployment method.
 
-To deploy Amazon Kinesis Aggregators as an Elastic Beanstalk application, create a new Elastic Beanstalk application, and when prompted by the AWS Management Console, upload the KinesisAggregators.war file from your local build. Select an instance type that is suitable for the type of aggregation that you are running (specifically, the higher the granularity of label items and the more fine-grained the TimeHorizon value, the larger the instance type you require). After deployment, click the URL for the application environment; the following message is displayed:
+To deploy Amazon Kinesis Aggregators as an Elastic Beanstalk application, start by creating a new Elastic Beanstalk web server application with the pre-configured Tomcat stack. When prompted by the AWS Management Console, upload the KinesisAggregators.war file from your local build. Select an instance type that is suitable for the type of aggregation that you are running (specifically, the higher the granularity of label items and the more fine-grained the TimeHorizon value, the larger the instance type you require). After deployment, click the URL for the application environment; the following message is displayed:
 
 ```OK - Kinesis Aggregators Managed Application hosted in Elastic Beanstalk Online ```
 
@@ -59,7 +59,7 @@ This indicates that the application is deployed but not configured. To configure
 * **environment** - The name of the environment. This ensures that all DynamoDB tables are prefixed with the environment, enabling you to keep data sets separate for test and production (for example).
 * **config-file-url** - The URL for the configuration file.
 
-Then, choose 'Save' and Elastic Beanstalk applies the changes to the environment. Wait a minute or so, and then snapshot logs to confirm that Amazon Kinesis Aggregators is running.
+This is typically done by adding `-D` flags to the JVM command line options. Then, choose 'Save' and Elastic Beanstalk applies the changes to the environment. Wait a minute or so, and then snapshot logs to confirm that Amazon Kinesis Aggregators is running.
 
 ### Running the Managed Java Client Application
 
