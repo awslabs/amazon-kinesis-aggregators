@@ -10,10 +10,10 @@
 	</properties>
 	<build>
 		<defaultGoal>clean source:jar install assembly:assembly war:war</defaultGoal>
-		<sourceDirectory>src</sourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
 		<resources>
 			<resource>
-				<directory>src</directory>
+				<directory>src/main/java</directory>
 				<includes>
 					<include>**/*.properties</include>
 				</includes>
