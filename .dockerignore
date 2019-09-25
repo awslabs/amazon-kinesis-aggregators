@@ -1,0 +1,8 @@
+Dockerfile
+target
+dist
+json-aggregator.json
+sample
+out
+.git
+.idea

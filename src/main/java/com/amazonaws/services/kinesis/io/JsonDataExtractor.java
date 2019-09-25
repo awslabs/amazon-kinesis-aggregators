@@ -139,7 +139,7 @@ public class JsonDataExtractor extends AbstractDataExtractor implements
 					} else {
 						// no formatter, so treat as epoch seconds
 						try {
-							dateValue = new Date(Long.parseLong(dateString));
+							dateValue = new Date(Long.parseLong(dateString)*1000);
 						} catch (Exception e) {
 							LOG.error(String
 									.format("Unable to create Date Value element from item '%s' due to invalid format as Epoch Seconds",

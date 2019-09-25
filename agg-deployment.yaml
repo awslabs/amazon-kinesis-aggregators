@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: agg
+  name: agg
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        io.kompose.service: agg
+    spec:
+      containers:
+      - image: metricfire/kinesis-agg
+        imagePullPolicy: Never
+        name: agg
+        env:
+        - name: AWS_SECRET_ACCESS_KEY
+          value: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        - name: AWS_ACCESS_KEY_ID
+          value: "aaaaaaaaaaaaaaaaaaaa"
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/kinesis-aggregators
+          name: config-volume
+      restartPolicy: Always
+      volumes:
+      - name: config-volume
+        configMap:
+          name: json-aggregator-config
+status: {}

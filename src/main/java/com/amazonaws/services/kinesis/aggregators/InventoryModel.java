@@ -103,6 +103,8 @@ public final class InventoryModel {
 
     public InventoryModel(AmazonDynamoDB dynamoClient) throws Exception {
         this.dynamoClient = dynamoClient;
+        // localhost
+        this.dynamoClient.setEndpoint("http://dynamodb:8000");
         init();
     }
 

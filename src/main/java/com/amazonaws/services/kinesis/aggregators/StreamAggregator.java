@@ -308,11 +308,13 @@ public class StreamAggregator implements IStreamAggregator {
 				this.config.getDynamoDBCredentialsProvider(), clientConfig);
 		if (region != null)
 			this.dynamoClient.setRegion(region);
-
+		// localhost
+		this.dynamoClient.setEndpoint("http://dynamodb:8000");
 		this.kinesisClient = new AmazonKinesisClient(
 				this.config.getKinesisCredentialsProvider());
 		if (region != null)
 			this.kinesisClient.setRegion(region);
+		this.kinesisClient.setEndpoint("http://kinesis:4567");
 
 		inventory = new InventoryModel(this.dynamoClient);
 

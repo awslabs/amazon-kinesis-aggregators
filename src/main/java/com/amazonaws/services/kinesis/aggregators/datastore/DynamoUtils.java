@@ -260,6 +260,8 @@ public class DynamoUtils {
 		// values, and another for the delete operations
 		final AmazonDynamoDB dynamoClient = new AmazonDynamoDBClient(
 				credentials);
+		// localhost
+		dynamoClient.setEndpoint("http://dynamodb:8000");
 		if (region != null)
 			dynamoClient.setRegion(region);
 		final AmazonDynamoDBAsyncClient deleteCli = new AmazonDynamoDBAsyncClient(

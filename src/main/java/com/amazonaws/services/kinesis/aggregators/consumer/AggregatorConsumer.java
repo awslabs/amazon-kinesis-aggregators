@@ -19,6 +19,10 @@ package com.amazonaws.services.kinesis.aggregators.consumer;
 import java.net.NetworkInterface;
 import java.util.UUID;
 
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.Protocol;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -88,7 +92,16 @@ public final class AggregatorConsumer {
 
 		IRecordProcessorFactory recordProcessorFactory = new AggregatorProcessorFactory(
 				aggGroup);
-		worker = new Worker(recordProcessorFactory, this.config);
+		ClientConfiguration c = this.config.getDynamoDBClientConfiguration();
+		c.setProtocol(Protocol.HTTP);
+		this.config = this.config.withDynamoDBClientConfig(c);
+		AmazonDynamoDB dynamoClient = new AmazonDynamoDBClient(this.config.getDynamoDBCredentialsProvider(), c);
+		// localhost
+		dynamoClient.setEndpoint("http://dynamodb:8000");
+
+		Worker.Builder builder = new Worker.Builder();
+		this.config = this.config.withKinesisEndpoint("http://kinesis:4567");
+		worker = builder.recordProcessorFactory(recordProcessorFactory).config(this.config).dynamoDBClient(dynamoClient).build();
 
 		int exitCode = 0;
 		int failures = 0;
