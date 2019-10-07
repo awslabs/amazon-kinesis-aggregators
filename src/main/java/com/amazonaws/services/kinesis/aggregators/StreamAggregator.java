@@ -700,7 +700,7 @@ public class StreamAggregator implements IStreamAggregator {
 					// to
 					// the current hwm
 					if (highSeq != null
-							&& highSeq.compareTo(thisSequence) != -1) {
+							&& highSeq.compareTo(thisSequence) > 0) {
 						ignoredRecordsBelowHWM++;
 						continue;
 					}
