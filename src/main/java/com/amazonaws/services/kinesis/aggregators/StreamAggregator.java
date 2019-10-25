@@ -96,6 +96,11 @@ public class StreamAggregator implements IStreamAggregator {
 	public static final String LAST_WRITE_SEQ = "lastWriteSeq";
 
 	/**
+	 * The attribute name used for the last write sequence value in the table.
+	 */
+	public static final String SAMPLES = "samples";
+
+	/**
 	 * The attribute name used for the timestamp of the update of the aggregate.
 	 */
 	public static final String LAST_WRITE_TIME = "lastWriteTime";

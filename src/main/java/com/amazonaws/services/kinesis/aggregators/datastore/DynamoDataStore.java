@@ -201,6 +201,13 @@ public class DynamoDataStore implements IDataStore {
                         StreamAggregator.LAST_WRITE_SEQ,
                         new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(
                                 new AttributeValue().withS(data.get(key1).getLastWriteSeq())));
+
+                // add last update time and sequence
+                updates.put(
+                        StreamAggregator.SAMPLES,
+                        new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(
+                                new AttributeValue().withS(data.get(key1).getSamples().toString())));
+
                 updates.put(
                         StreamAggregator.LAST_WRITE_TIME,
                         new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(

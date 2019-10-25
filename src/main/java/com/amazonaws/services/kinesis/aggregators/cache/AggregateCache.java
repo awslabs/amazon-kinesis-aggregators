@@ -16,6 +16,7 @@
  */
 package com.amazonaws.services.kinesis.aggregators.cache;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -262,6 +263,7 @@ public class AggregateCache {
 		payload.incrementCount(countIncrement);
 
 		// process summary updates based on the summary configuration
+		Double sample_value = null;
 		if (aggregatorType.equals(AggregatorType.SUM)) {
 			// process all the requested calculations
 			for (String s : calculationConfig.getItemSet()) {
@@ -273,11 +275,21 @@ public class AggregateCache {
 						payload.updateSummary(e.getAttributeAlias(),
 								summedIncrements.get(e.getStreamDataElement()),
 								e);
+						sample_value = summedIncrements.get(e.getStreamDataElement());
 					} else {
 						logWarn(String
 								.format("Summary Item '%s' not found in Extracted Data - Ignoring",
 										s));
 					}
+				}
+			}
+
+			// add sample after loop to avoid duplicates
+			if (sample_value != null) {
+				ArrayList<Double> samples = payload.getSamples();
+				// TODO: add configuration option to parametrize thiss
+				if (samples.size() <= 10) {
+					samples.add(sample_value);
 				}
 			}
 		}

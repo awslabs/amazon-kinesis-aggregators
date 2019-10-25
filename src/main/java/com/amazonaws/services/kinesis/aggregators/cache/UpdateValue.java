@@ -17,6 +17,7 @@
 package com.amazonaws.services.kinesis.aggregators.cache;
 
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Map;
 
 import com.amazonaws.services.kinesis.aggregators.StreamAggregator;
@@ -42,9 +43,12 @@ public class UpdateValue {
 
     private long lastWriteTime;
 
+    private ArrayList<Double> samples;
+
     public UpdateValue() {
         this.aggregateCount = 0;
         this.summaryValues = new HashMap<>();
+        this.samples = new ArrayList<Double>();
     }
 
     public void incrementCount(int count) {
@@ -98,6 +102,10 @@ public class UpdateValue {
 
     public String getLastWriteSeq() {
         return lastWriteSeq;
+    }
+
+    public ArrayList<Double> getSamples() {
+        return this.samples;
     }
 
     public long getLastWriteTime() {
