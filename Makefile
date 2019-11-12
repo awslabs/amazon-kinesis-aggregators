@@ -1,2 +1,2 @@
 build-docker:
-	docker build . -t metricfire/kinesis-agg
+	docker build --no-cache . -t metricfire/kinesis-agg

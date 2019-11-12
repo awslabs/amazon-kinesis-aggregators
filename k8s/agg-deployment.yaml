@@ -18,9 +18,9 @@ spec:
         name: agg
         env:
         - name: AWS_SECRET_ACCESS_KEY
-          value: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          value: "secret"
         - name: AWS_ACCESS_KEY_ID
-          value: "aaaaaaaaaaaaaaaaaaaa"
+          value: "key"
         resources: {}
         volumeMounts:
         - mountPath: /etc/kinesis-aggregators
