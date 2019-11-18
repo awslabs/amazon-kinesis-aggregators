@@ -41,12 +41,9 @@ public enum TimeHorizon {
 
         @Override
         public String getValue(Date forDate) {
-            calendar.setTime(forDate);
-            int minutes = calendar.get(Calendar.MINUTE);
-            int bucket = new Double(Math.floor(minutes / scope) * scope).intValue();
-            return String.format("%s:%02d",
-                    new SimpleDateFormat("yyyy-MM-dd HH").format(forDate),
-                    bucket);
+            long timestamp = forDate.getTime();
+            long bucket = ((timestamp / 60000L) / scope) * scope * 60000L;
+            return Long.toString(bucket);
         }
     },
     HOUR(2, "MM-dd HH:00:00", "H"), DAY(3, "MM-dd 00:00:00", "d"), WEEK(4, "ww", "W"), MONTH(5, "MM-01 00:00:00", "M"), YEAR(
