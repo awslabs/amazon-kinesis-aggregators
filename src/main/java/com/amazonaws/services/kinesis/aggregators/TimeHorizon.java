@@ -23,31 +23,9 @@ import java.util.Date;
 import java.util.List;
 
 public enum TimeHorizon {
-    SECOND(0, "MM-dd HH:mm:ss", "s"), MINUTE(1, "MM-dd HH:mm:00", "m"), MINUTES_GROUPED(1, null,
-            "mb") {
-        private Calendar calendar = Calendar.getInstance();
-
-        private int scope;
-
-        @Override
-        public int getGranularity() {
-            return this.scope;
-        }
-
-        @Override
-        public void setGranularity(int bucketSize) {
-            this.scope = bucketSize;
-        }
-
-        @Override
-        public String getValue(Date forDate) {
-            long timestamp = forDate.getTime();
-            long bucket = ((timestamp / 60000L) / scope) * scope * 60000L;
-            return Long.toString(bucket);
-        }
-    },
-    HOUR(2, "MM-dd HH:00:00", "H"), DAY(3, "MM-dd 00:00:00", "d"), WEEK(4, "ww", "W"), MONTH(5, "MM-01 00:00:00", "M"), YEAR(
-            6, "01-01 00:00:00", "Y"), FOREVER(999, "", "*") {
+    SECOND(0, 1000, "s"), MINUTE(1, 60000, "m"), MINUTES_GROUPED(1, 60000, "mb"),
+    HOUR(2, 3600000L, "H"), DAY(3, 86400000L, "d"), WEEK(4, 604800000L, "W"), MONTH(5, 2592000000L, "M"), YEAR(
+            6, 31536000000L, "Y"), FOREVER(999, -1, "*") {
         /**
          * Override the getValue method, as TimeHorizon.FOREVER is for all
          * values regardless of time period. We'll set the value to '*' as
@@ -59,21 +37,19 @@ public enum TimeHorizon {
         }
     };
 
-    private TimeHorizon(int placemark, String mask, String abbrev) {
+    private TimeHorizon(int placemark, long resolution, String abbrev) {
         this.placemark = placemark;
-        this.mask = mask;
+        this.resolution = resolution;
         this.abbrev = abbrev;
+        this.chunks = 1;
     }
 
     private int placemark;
 
-    private String mask;
+    private long chunks;
+    private long resolution;
 
     private String abbrev;
-
-    private SimpleDateFormat getMask() {
-        return new SimpleDateFormat("yyyy-" + this.mask);
-    }
 
     public String getAbbrev() {
         return this.abbrev;
@@ -84,7 +60,9 @@ public enum TimeHorizon {
     }
 
     public String getValue(Date forDate) {
-        return getMask().format(forDate);
+        long timestamp = forDate.getTime();
+        long bucket = (timestamp / (this.resolution * this.chunks)) * (this.resolution * this.chunks); // int div to round
+        return Long.toString(bucket);
     }
 
     /**
@@ -121,11 +99,11 @@ public enum TimeHorizon {
         return hierarchy;
     }
 
-    public int getGranularity() throws Exception {
-        throw new Exception("Not Implemented");
+    public long getGranularity() throws Exception {
+        return this.chunks;
     }
 
-    public void setGranularity(int scope) throws Exception {
-        throw new Exception("Not Implemented");
+    public void setGranularity(long chunks) throws Exception {
+        this.chunks = chunks;
     }
 }

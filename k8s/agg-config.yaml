@@ -7,7 +7,7 @@ data:
     [
       {
           "namespace":"TestMinutesGrouped",
-          "timeHorizons":["MINUTES_GROUPED(5)"],
+          "timeHorizons":["SECOND", "MINUTE", "MINUTES_GROUPED(5)", "HOUR"],
           "type":"SUM",
           "dataExtractor":"JSON",
           "labelItems":["metric_name", "uid"],
