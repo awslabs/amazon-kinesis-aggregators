@@ -237,13 +237,29 @@ public class DynamoDataStore implements IDataStore {
                         }
                     }
                 }
-
+                System.out.println(updates);
                 // do the update to all sum and count attributes as well
                 // as the last write sequence and time - this gives us a key to
                 // write other calculations onto
+                Map<String, String> attributeNames = new HashMap<String, String>();
+                Map<String, AttributeValue> attributeValues = new HashMap<String, AttributeValue>();
+                attributeNames.put("#samples", "samples");
+
+                ArrayList<Double> samples = data.get(key1).getSamples();
+
+                // convert samples to attributeValues
+                AttributeValue[] samplesAsAttributes = new AttributeValue[samples.size()];
+                for (int i = 0; i < samples.size() ; i++) {
+                    samplesAsAttributes[i] = new AttributeValue().withN("" + samples.get(i));
+                }
+                attributeValues.put(":samples", new AttributeValue().withL(samplesAsAttributes));
+
                 req = new UpdateItemRequest().withTableName(tableName).withKey(
-                        StreamAggregatorUtils.getTableKey(key1)).withAttributeUpdates(updates).withReturnValues(
-                        ReturnValue.UPDATED_NEW);
+                        StreamAggregatorUtils.getTableKey(key1)).withAttributeUpdates(updates)
+                        .withUpdateExpression("SET #samples := list_append(#samples, :samples)")
+                        .withExpressionAttributeNames(attributeNames)
+                        .withExpressionAttributeValues(attributeValues)
+                        .withReturnValues(ReturnValue.UPDATED_NEW);
                 result = DynamoUtils.updateWithRetries(dynamoClient, req);
 
                 // add the event count to the modifications made
@@ -401,7 +417,7 @@ public class DynamoDataStore implements IDataStore {
      * Method which examines an table which backs an Aggregator, and returns a
      * string value which represents the list of attributes in the table. This
      * method assumes that all elements in an aggregate table are the same.
-     * 
+     *
      * @param dynamoClient Dynamo DB Client to use for connection to Dynamo DB.
      * @param dynamoTable The Table to get the structure of.
      * @return A String representation of the attribute names in the table.
@@ -421,7 +437,7 @@ public class DynamoDataStore implements IDataStore {
      * Generate a list of attribute names found in the Aggregator's dynamo
      * table. Assumes that all Items in the Aggregator table are of the same
      * structure.
-     * 
+     *
      * @param dynamoClient Dynamo DB Client to use for connection to Dynamo DB.
      * @param dynamoTable The Dynamo Table for the Aggregator
      * @return A list of attribute names from the Dynamo table
