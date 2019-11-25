@@ -56,8 +56,10 @@ import com.amazonaws.services.kinesis.aggregators.StreamAggregator;
 import com.amazonaws.services.kinesis.aggregators.StreamAggregatorUtils;
 import com.amazonaws.services.kinesis.aggregators.cache.UpdateKey;
 import com.amazonaws.services.kinesis.aggregators.cache.UpdateValue;
+import com.amazonaws.services.kinesis.aggregators.datastore.expressions.*;
 import com.amazonaws.services.kinesis.aggregators.summary.SummaryCalculation;
 import com.amazonaws.services.kinesis.model.ResourceNotFoundException;
+
 
 public class DynamoDataStore implements IDataStore {
     public enum DynamoSummaryUpdateMethod {
@@ -179,40 +181,58 @@ public class DynamoDataStore implements IDataStore {
 
                 Map<String, AttributeValueUpdate> updates = new HashMap<>();
 
-                updates.put(
-                        SCATTER_PREFIX_ATTRIBUTE,
-                        new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(
-                                new AttributeValue().withN("" + r.nextInt(SCATTER_WIDTH))));
+                Map<String, String> attributeNames = new HashMap<String, String>();
+                Map<String, AttributeValue> attributeValues = new HashMap<String, AttributeValue>();
+
+                UpdateExpression.Clause<SetAction> sets = new UpdateExpression.Clause<SetAction>();
+                UpdateExpression.Clause<AddAction> adds = new UpdateExpression.Clause<AddAction>();
+
+                AttributeValueUpdate scatterUpdate = new AttributeValueUpdate()
+                    .withAction(AttributeAction.PUT);
+
+                attributeNames.put("#SCATTER_WIDTH", SCATTER_PREFIX_ATTRIBUTE);
+                attributeValues.put(":scatter_width", new AttributeValue().withN("" + r.nextInt(SCATTER_WIDTH)));
+
+                sets.add(new SetAction("#SCATTER_WIDTH", ":scatter_width"));
 
                 // add the event count update to the list of updates to be made
-                updates.put(
-                        StreamAggregator.EVENT_COUNT,
-                        new AttributeValueUpdate().withAction(AttributeAction.ADD).withValue(
-                                new AttributeValue().withN("" + data.get(key1).getAggregateCount())));
+                attributeNames.put("#EVENT_COUNT", StreamAggregator.EVENT_COUNT);
+                attributeValues.put(":event_count", new AttributeValue().withN("" + data.get(key1).getAggregateCount()));
+
+                adds.add(new AddAction("#EVENT_COUNT", ":event_count"));
 
                 // add the time horizon type to the item
-                updates.put(
-                        StreamAggregator.TIME_HORIZON_ATTR,
-                        new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(
-                                new AttributeValue().withS(key1.getTimeHorizon().getAbbrev())));
+                attributeNames.put("#TIME_HORIZON_ATTR", StreamAggregator.TIME_HORIZON_ATTR);
+                attributeValues.put(":time_horizon_attr", new AttributeValue().withS(key1.getTimeHorizon().getAbbrev()));
+
+                sets.add(new SetAction("#TIME_HORIZON_ATTR", ":time_horizon_attr"));
 
                 // add last update time and sequence
-                updates.put(
-                        StreamAggregator.LAST_WRITE_SEQ,
-                        new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(
-                                new AttributeValue().withS(data.get(key1).getLastWriteSeq())));
+                attributeNames.put("#LAST_WRITE_SEQ", StreamAggregator.LAST_WRITE_SEQ);
+                attributeValues.put(":last_write_seq", new AttributeValue().withS(data.get(key1).getLastWriteSeq()));
+
+                sets.add(new SetAction("#LAST_WRITE_SEQ", ":last_write_seq"));
 
                 // add last update time and sequence
+
+                // TODO separately
                 updates.put(
                         StreamAggregator.SAMPLES,
                         new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(
                                 new AttributeValue().withS(data.get(key1).getSamples().toString())));
+                // end TODO
 
-                updates.put(
-                        StreamAggregator.LAST_WRITE_TIME,
-                        new AttributeValueUpdate().withAction(AttributeAction.PUT).withValue(
-                                new AttributeValue().withS(StreamAggregator.dateFormatter.format(new Date(
-                                        data.get(key1).getLastWriteTime())))));
+                attributeNames.put("#LAST_WRITE_TIME", StreamAggregator.LAST_WRITE_TIME);
+                attributeValues.put(":last_write_time",
+                    new AttributeValue()
+                        .withS(
+                            StreamAggregator.dateFormatter.format(
+                                new Date(data.get(key1).getLastWriteTime())
+                            )
+                        )
+                );
+
+                sets.add(new SetAction("#LAST_WRITE_TIME", ":last_write_time"));
 
                 if (this.aggregatorType.equals(AggregatorType.SUM)) {
                     for (final String attribute : data.get(key1).getSummaryValues().keySet()) {
@@ -221,13 +241,13 @@ public class DynamoDataStore implements IDataStore {
 
                         if (!update.getCalculationApplied().getSummaryUpdateMethod().equals(
                                 DynamoSummaryUpdateMethod.CONDITIONAL)) {
+
                             String setAttributeName = StreamAggregatorUtils.methodToColumn(attribute);
 
-                            updates.put(
-                                    setAttributeName,
-                                    new AttributeValueUpdate().withAction(
-                                            update.getCalculationApplied().getSummaryUpdateMethod().getAction()).withValue(
-                                            new AttributeValue().withN("" + update.getFinalValue())));
+                            attributeNames.put("#" + setAttributeName.replace("-", ""), setAttributeName);
+                            attributeValues.put(":" + setAttributeName.replace("-", ""),
+                                new AttributeValue().withN("" + update.getFinalValue()));
+                            adds.add(new AddAction("#" + setAttributeName.replace("-", ""), ":" + setAttributeName.replace("-", "")));
 
                             // add a stub entry so that we can extract the
                             // updated value from the resultset
@@ -237,13 +257,12 @@ public class DynamoDataStore implements IDataStore {
                         }
                     }
                 }
+                System.out.println(attributeNames);
+                System.out.println(attributeValues);
                 System.out.println(updates);
                 // do the update to all sum and count attributes as well
                 // as the last write sequence and time - this gives us a key to
                 // write other calculations onto
-                Map<String, String> attributeNames = new HashMap<String, String>();
-                Map<String, AttributeValue> attributeValues = new HashMap<String, AttributeValue>();
-                attributeNames.put("#samples", "samples");
 
                 ArrayList<Double> samples = data.get(key1).getSamples();
 
@@ -252,11 +271,17 @@ public class DynamoDataStore implements IDataStore {
                 for (int i = 0; i < samples.size() ; i++) {
                     samplesAsAttributes[i] = new AttributeValue().withN("" + samples.get(i));
                 }
+
+                attributeNames.put("#samples", "samples");
                 attributeValues.put(":samples", new AttributeValue().withL(samplesAsAttributes));
 
+                sets.add(new SetAction("#samples", new SetAction.Raw(new SetAction.Append("#samples",":samples"))));
+
+                System.out.println("HER expression: ");
+                System.out.println(new UpdateExpression(sets, adds).toString());
                 req = new UpdateItemRequest().withTableName(tableName).withKey(
-                        StreamAggregatorUtils.getTableKey(key1)).withAttributeUpdates(updates)
-                        .withUpdateExpression("SET #samples := list_append(#samples, :samples)")
+                        StreamAggregatorUtils.getTableKey(key1))
+                        .withUpdateExpression(new UpdateExpression(sets, adds).toString())
                         .withExpressionAttributeNames(attributeNames)
                         .withExpressionAttributeValues(attributeValues)
                         .withReturnValues(ReturnValue.UPDATED_NEW);
