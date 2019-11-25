@@ -1,8 +1,12 @@
 # build
 FROM maven
-COPY . /app
+RUN mkdir /app
 WORKDIR /app
-RUN mvn clean source:jar install assembly:assembly war:war 
+COPY ./pom.xml ./
+RUN mvn dependency:go-offline
+
+COPY . ./
+RUN mvn source:jar install assembly:assembly war:war 
 
 FROM openjdk
 COPY ["run_agg.sh", "/"]
