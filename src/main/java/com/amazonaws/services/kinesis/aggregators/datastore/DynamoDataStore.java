@@ -257,9 +257,6 @@ public class DynamoDataStore implements IDataStore {
                         }
                     }
                 }
-                System.out.println(attributeNames);
-                System.out.println(attributeValues);
-                System.out.println(updates);
                 // do the update to all sum and count attributes as well
                 // as the last write sequence and time - this gives us a key to
                 // write other calculations onto
@@ -274,11 +271,11 @@ public class DynamoDataStore implements IDataStore {
 
                 attributeNames.put("#samples", "samples");
                 attributeValues.put(":samples", new AttributeValue().withL(samplesAsAttributes));
+                attributeValues.put(":empty_list", new AttributeValue().withL(new AttributeValue[0]));
+                String exists = new SetAction.IfNotExists("#samples", ":empty_list").toString();
 
-                sets.add(new SetAction("#samples", new SetAction.Raw(new SetAction.Append("#samples",":samples"))));
+                sets.add(new SetAction("#samples", new SetAction.Raw(new SetAction.Append(exists,":samples"))));
 
-                System.out.println("HER expression: ");
-                System.out.println(new UpdateExpression(sets, adds).toString());
                 req = new UpdateItemRequest().withTableName(tableName).withKey(
                         StreamAggregatorUtils.getTableKey(key1))
                         .withUpdateExpression(new UpdateExpression(sets, adds).toString())
