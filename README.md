@@ -1,10 +1,10 @@
-Amazon Kinesis Aggregators
+# Amazon Kinesis Aggregators
 
-Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+----
 
-Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
+*This project is now deprecated, and only updates for security vulnerabilities in dependencies will be made. We advise the use of Apache Flink on Amazon Kinesis Analytics instead.*
 
-http://aws.amazon.com/asl/
+----
 
 Amazon Kinesis Aggregators is a Java framework that enables the automatic creation of real-time aggregated time series data from Amazon Kinesis streams. 
 
@@ -593,6 +593,8 @@ throws Exception;
 public void setRegion(Region region);
 }
 ```
+
+----
 
 Copyright 2014 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
